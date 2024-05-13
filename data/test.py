@@ -1,0 +1,12 @@
+import pickle
+import base64
+import json
+
+output = ""
+#print(output)
+
+theString = json.loads(base64.b64decode("ZWE3OTg4Yjc5OGUyMjNiODQyMGE2NTFkMzViMTE4NTUwZjhkMjE1NDp7Il9hdXRoX3VzZXJfaWQiOiIxNjkzNjkiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImVmNmI0MDIwZDQzYWY2ODhhYWU5MTQ4NmI1OWZkNDA5ODk4ODljODIifQ==").decode().split(":", 1)[-1])
+
+print(theString)
+
+#print(pickle.loads(base64.b64decode("ZWE3OTg4Yjc5OGUyMjNiODQyMGE2NTFkMzViMTE4NTUwZjhkMjE1NDp7Il9hdXRoX3VzZXJfaWQiOiIxNjkzNjkiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaGFzaCI6ImVmNmI0MDIwZDQzYWY2ODhhYWU5MTQ4NmI1OWZkNDA5ODk4ODljODIifQ==")))

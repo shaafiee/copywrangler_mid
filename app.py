@@ -107,43 +107,10 @@ async def landing():
 		for htmlLine in fileData:
 			htmlData = htmlData + htmlLine
 		return htmlData
-	
 
-@app.get('/logs')
-async def logs(session: str, queue: int):
-	if session is not None or len(session) < 1:
-		session = re.sub(r"('|;)", "", session)
-	else:
-		return {"status": 0, "error": "session key not found"}
 
-	cw_conn, cw_cur = cwDbConnect()
-
-	userId, firstName = cwCheckSession(cw_conn, cw_cur, session)
-	if not userId:
-		return {"status": 0, "error": "could not verify session"}
-
-	if queue < 1:
-		return {"status": 0, "error": "queue ID not found"}
-
-	conn, cur = dbConnect()
-
-	cur.execute("select id, event_type, event_desc, event from log where queue_id = %s", (queue, ))
-	results = []
-	for row in cur:
-		results.append({	"id": row[0],
-					"eventClass": row[1],
-					"eventSubject": row[2],
-					"event": row[3]
-			})
-
-	if len(results) < 1:
-		return {"status": 0, "error": "no events associated with this queue"}
-	
-	return {"status": 1, "log": results}
-	
-
-@app.post('/prompt')
-def prompt(scope: LiteratureScope):
+@app.post('/pull')
+def pull(scope: PullScope):
 	session = scope.session
 	if session is not None or len(session) < 1:
 		session = re.sub(r"('|;)", "", session)
@@ -162,44 +129,13 @@ def prompt(scope: LiteratureScope):
 
 	conn, cur = dbConnect()
 
-	questions = scope.questions
-	answers = scope.answers
+	cur.execute("select id, pages, collections, scope from queue where pull = 1 and done <> 1 and term <> 1")
+	if cur.rowcount > 0:
+		return {"status": 0, "error": "A pull request is still being processed"}
 
-	openai_key = getSecret('openai_key')
-	openai_key = re.sub(r"\s+", "", openai_key)
-	openai_key = re.sub(r"\n", "", openai_key)
-	openaiHeaders = {"Accept": "*/*", "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36", "Content-Type": "application/json", "Authorization": f"Bearer {openai_key}"}
-
-	conversation = []
-	for idx, question in enumerate(questions):
-		conversation.append({"role": "user", "content": question})
-		if len(answers) > idx:
-			conversation.append({"role": "assistant", "content": answers[idx]})
-
-	openai_model = getSecret('openai_model')
-	returned = requests.post("https://api.openai.com/v1/chat/completions", headers=openaiHeaders, json={"model": openai_model, "messages": conversation})
-	retries = 3 
-	while returned.status_code == 429 and retries > 0:
-		time.sleep(.5)
-		returned = requests.post("https://api.openai.com/v1/chat/completions", headers=openaiHeaders, json={"model": "gpt-3.5-turbo", "messages": conversation})
-		retries -= 1
-
-	aiResponse = returned.json()
-	if returned.status_code == 200:
-		answer = aiResponse["choices"][0]["message"]["content"]
-		return {"status": 1, "message": "okay", "answer": answer}
-	else:
-		if "error" in aiResponse.keys(): 
-			return {"status": 0, "message": "something went wrong", "code": aiResponse["error"]["code"], "returned": aiResponse}
-		else:
-			return {"status": 0, "message": "something went wrong", "returned": aiResponse, "code": "unknown"}
-
-	return {"status": 1, "message": "reached end"}
-	#gcpHandshake = getSecret("handshake")
-	#print(gcpHandshake)
-	#hashedHandshake = xor(gcpHandshake, "12345abcde")
-	#print(hashedHandshake)
-	#return {"status": 1, "message": "found", "handshake": hashedHandshake}
+	cur.execute("insert into queue (pull, pages, collections, scope) values (1, %s, %s, %s)", (scope.pages, scope.collections, scope.scope))
+	conn.commit()
+	return {"status": 1, "error": "Pull request queued"}
 
 
 @app.post('/assist')
