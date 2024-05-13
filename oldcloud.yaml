@@ -1,0 +1,32 @@
+steps:
+# Build the container image
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/github.com/comfortworks/openai-endpoints:$COMMIT_SHA', '.']
+# Push the container image to Container Registry
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/github.com/comfortworks/openai-endpoints:$COMMIT_SHA']
+# Deploy container image to GCS
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args: ['compute', 'instances',
+         'update-container', 'openai-endpoints',
+         '--container-image',
+         'gcr.io/$PROJECT_ID/github.com/comfortworks/openai-endpoints:$COMMIT_SHA']
+  env:
+  - 'CLOUDSDK_COMPUTE_REGION=us-central1'
+  - 'CLOUDSDK_COMPUTE_ZONE=us-central1-a'
+  - 'GOOGLE_CLOUD_PROJECT=cw-webshop'
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['compute','instances','add-metadata','openai-endpoints','--zone','us-central1-a','--metadata-from-file=startup-script=/workspace/startup-vm.bash']
+#  - 'compute'
+#  - 'deploy'
+#  - 'openai-endpoints'
+#  - '--container-image'
+#  - 'gcr.io/$PROJECT_ID/github.com/comfortworks/openai-endpoints:$COMMIT_SHA'
+#  - '--region'
+#  - 'us-central1'
+images:
+  - 'gcr.io/$PROJECT_ID/github.com/comfortworks/openai-endpoints:$COMMIT_SHA'
+options:
+  logging: CLOUD_LOGGING_ONLY
+
