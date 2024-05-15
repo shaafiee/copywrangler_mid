@@ -130,7 +130,63 @@ def pull(scope: PullScope):
 
 	cur.execute("insert into queue (pull, pages, collections, scope) values (1, %s, %s, %s)", (scope.pages, scope.collections, scope.scope))
 	conn.commit()
-	return {"status": 1, "error": "Pull request queued"}
+	return {"status": 1, "content": "Pull request queued"}
+
+
+@app.get('/lasttimes')
+def lasttimes(session: str):
+	if session is not None or len(session) < 1:
+		session = re.sub(r"('|;)", "", session)
+	else:
+		return {"status": 0, "error": "session key not found"}
+
+	cw_conn, cw_cur = cwDbConnect()
+
+	userId, firstName = cwCheckSession(cw_conn, cw_cur, session)
+	if not userId:
+		return {"status": 0, "error": "could not verify session"}
+
+	conn, cur = dbConnect()
+
+	try:
+		cur.execute("select unix_timestamp(updated) from page order by id desc limit 1")
+	except Exception as e:
+		print(e)
+		print(traceback.format_exc())
+		return {"status": 0, "error": str(traceback.format_exec())}
+	pageTimestamp = cur.fetchone()[0]
+
+	return {"status": 1, "content": {"page": pageTimestamp, "collection": 0}}
+	
+
+@app.post('/pullcontent')
+def pullcontent(scope: PullScope):
+	session = scope.session
+	if session is not None or len(session) < 1:
+		session = re.sub(r"('|;)", "", session)
+	else:
+		return {"status": 0, "error": "session key not found"}
+
+	cw_conn, cw_cur = cwDbConnect()
+
+	userId, firstName = cwCheckSession(cw_conn, cw_cur, session)
+	if not userId:
+		return {"status": 0, "error": "could not verify session"}
+
+	conn, cur = dbConnect()
+	pages = []
+	collections = []
+
+	if scope.pages == 1:
+		cur.execute("select id, handle, template_suffix from page")
+		rows = cur.fetchall()
+		for row in rows:
+			pages.append(row)
+
+	if scope.collections == 1:
+		collections = []
+
+	return {"status": 1, "content": {"pages": pages, "collections": collections}}
 
 
 if __name__ == '__main__':
