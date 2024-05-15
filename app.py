@@ -26,7 +26,7 @@ import json
 import base64
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
-from openai import OpenAI
+#from openai import OpenAI
 
 
 app = FastAPI()
@@ -46,11 +46,6 @@ app.add_middleware(
 
 currentSubdomain = "cw40"
 headers = {"Accept": "*/*", "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36", "Content-Type": "application/json", "Origin": "https://" + currentSubdomain + "comfort-works.com", "Referer": "https://" + currentSubdomain + "comfort-works.com/en/my-account/authenticate/"}
-#openaiHeaders = {"Accept": "*/*", "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36", "Content-Type": "application/json", "Origin": "https://" + currentSubdomain + "comfort-works.com", "Referer": "https://" + currentSubdomain + "comfort-works.com/en/my-account/authenticate/", "Authorization": f"Bearer {openai_key}"}
-openai_key = getSecret('openai_key')
-openai_key = re.sub(r"\s+", "", openai_key)
-openai_key = re.sub(r"\n", "", openai_key)
-openaiHeaders = {"Accept": "*/*", "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36", "Content-Type": "application/json", "Authorization": f"Bearer {openai_key}"}
 
 
 def sessionKeyExists(conn, cur, chatKey):
