@@ -91,7 +91,23 @@
 		}
 
 		function pull() {
-			let 
+			let data = {
+				"session": sessionId,
+				"pull": 1,
+				"push": 0,
+				"scope": ""
+			}
+
+			fetch("/pull", {
+				method: "POST", 
+				cache: "no-cache", 
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify(data)
+			})
+			.then((data) => data.json())
+			.then((content) => {
+				console.log(content);
+			});
 		}
 
         </script>

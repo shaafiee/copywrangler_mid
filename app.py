@@ -124,7 +124,7 @@ def pull(scope: PullScope):
 
 	conn, cur = dbConnect()
 
-	cur.execute("select id, pages, collections, scope from queue where pull = 1 and done <> 1 and term <> 1")
+	cur.execute("select id, pages, collections, scope from queue where pull = 1 and (done is NULL or done <> 1) and (term is NULL or term <> 1)")
 	if cur.rowcount > 0:
 		return {"status": 0, "error": "A pull request is still being processed"}
 
