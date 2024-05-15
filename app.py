@@ -1,4 +1,4 @@
-j# @package POTTS
+# @package POTTS
 
 ## @file app.py
 
