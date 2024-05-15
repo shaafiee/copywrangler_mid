@@ -1,4 +1,4 @@
-## @package POTTS
+j# @package POTTS
 
 ## @file app.py
 
@@ -26,6 +26,7 @@ import json
 import base64
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+import traceback
 #from openai import OpenAI
 
 
