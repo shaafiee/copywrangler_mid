@@ -105,6 +105,33 @@ async def landing():
 		return htmlData
 
 
+@app.post('/checkpull')
+def checkPull(scope: PullScope):
+	session = scope.session
+	if session is not None or len(session) < 1:
+		session = re.sub(r"('|;)", "", session)
+	else:
+		return {"status": 0, "error": "session key not found"}
+
+	#for refCode in scope.products:
+	#	if not re.match(r"^[a-zA-Z0-9_\-\/\s]*$", refCode):
+	#		return {"status": 0, "error": f"incorrect ref code {refCode}"}
+
+	cw_conn, cw_cur = cwDbConnect()
+
+	userId, firstName = cwCheckSession(cw_conn, cw_cur, session)
+	if not userId:
+		return {"status": 0, "error": "could not verify session"}
+
+	conn, cur = dbConnect()
+
+	cur.execute("select id, pages, collections, scope from queue where pull = 1 and (done is NULL or done <> 1) and (term is NULL or term <> 1)")
+	if cur.rowcount > 0:
+		return {"status": 0, "error": "A pull request is still being processed"}
+	else:
+		return {"status": 1, "content": "No pull requests"}
+
+
 @app.post('/pull')
 def pull(scope: PullScope):
 	session = scope.session
@@ -179,7 +206,7 @@ def pullcontent(scope: PullScope):
 	collections = []
 
 	if scope.pages == 1:
-		cur.execute("select id, handle, template_suffix from page")
+		cur.execute("select id, handle, template_suffix from page order by handle")
 		rows = cur.fetchall()
 		for row in rows:
 			pages.append(row)
@@ -188,6 +215,43 @@ def pullcontent(scope: PullScope):
 		collections = []
 
 	return {"status": 1, "content": {"pages": pages, "collections": collections}}
+
+
+@app.post('/pulltrans')
+def pulltrans(scope: PullTransScope):
+	if scope.page == 0 and scope.collection == 0:
+		return {"status": 0, "error": "must specify a resource"}
+
+	session = scope.session
+	if session is not None or len(session) < 1:
+		session = re.sub(r"('|;)", "", session)
+	else:
+		return {"status": 0, "error": "session key not found"}
+
+	cw_conn, cw_cur = cwDbConnect()
+
+	userId, firstName = cwCheckSession(cw_conn, cw_cur, session)
+	if not userId:
+		return {"status": 0, "error": "could not verify session"}
+
+	conn, cur = dbConnect()
+
+	if scope.page == 1:
+		cur.execute("select id, tr_key, tr_value, lang from translatable where page_id = %s", (scope.page, ))
+		rows = cur.fetchall()
+
+		pageTrans = {}
+		for row in rows:
+			if row[3] not in pageTrans.keys():
+				pageTrans[row[3]] = {}
+			if row[1] not in pageTrans[row[3]].keys():
+				pageTrans[row[3]][row[1]] = {}
+			pageTrans[row[3]][row[1]] = {'id': row[0], 'value': row[2]}
+
+	if scope.collection == 1:
+		collTrans = {}
+
+	return {"status": 1, "content": {"pages": pageTrans, "collections": collTrans}}
 
 
 if __name__ == '__main__':

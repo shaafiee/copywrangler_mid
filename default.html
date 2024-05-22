@@ -107,6 +107,67 @@
 			.then((data) => data.json())
 			.then((content) => {
 				console.log(content);
+				if (data.status == 1) {
+					pullContent();
+				}
+			});
+		}
+
+		function pullcontent() {
+			let data = {
+				"session": sessionId,
+				"pages": 1,
+				"collections": 1,
+				"scope": ""
+			}
+
+			fetch("/pullcontent", {
+				method: "POST", 
+				cache: "no-cache", 
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify(data)
+			})
+			.then((data) => data.json())
+			.then((content) => {
+				console.log(content);
+				if (data.status == 1) {
+					let docEle;
+					let parentEle = document.getElementById('dataColl');
+					content.pages.forEach((pageNow) => {
+						docEle = document.createElement("div");
+						docEle.setAttribute("id", `page_${pageNow[0]}`);
+						docEle.setAttribute("class", `aPage`);
+						docEle.innerHTML = `${pageNow[1]} / ${pageNow[2]}`;
+						parentEle.append(docEle);
+					});
+				}
+			});
+		}
+
+		function pullTrans() {
+			let data = {
+				"session": sessionId,
+				"pages": 1,
+				"collections": 1,
+				"scope": ""
+			}
+
+			fetch("/pulltrans", {
+				method: "POST", 
+				cache: "no-cache", 
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify(data)
+			})
+			.then((data) => data.json())
+			.then((content) => {
+				console.log(content);
+				if (data.status == 1) {
+					Object.keys(content.pages).forEach((lang) => {
+						Object.keys(content.pages[lang]).forEach((trKey) => {
+							content.pages[lang][trKey]
+						});
+					});
+				}
 			});
 		}
 
@@ -119,9 +180,9 @@
 		<div id="pageCollDiv">
 			<div id="buttonsDiv">
                        		<button type="button" id="pullButton" class="button mainButtons">Pull</button>
-                       		<button type="button" id="pushButton" class="button mainButtons">Push</button>
+                       		<!--<button type="button" id="pushButton" class="button mainButtons">Push</button>-->
 			</div>
-			<div id="pageColl">
+			<div id="dataColl">
 			</div>
 		</div>
 		<div id="workingPane">

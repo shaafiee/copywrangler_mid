@@ -18,3 +18,9 @@ class PullScope(BaseModel):
 	collections: int | None = 0
 	scope: str | None = None
 
+class PullTransScope(BaseModel):
+	session: str
+	page: int | None = 0
+	collection: int | None = 0
+	scope: str | None = None
+
