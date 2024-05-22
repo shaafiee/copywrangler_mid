@@ -22,6 +22,12 @@
 			margin: auto;
 			width: 100%;
 			text-align: center;
+			cursor: pointer;
+		}
+
+		#buttonBusy {
+			cursor: wait !important;
+			background: #ed558a;
 		}
 
                 #pageCollDiv {
@@ -57,7 +63,29 @@
 		}
 
         </style>
+
         <script>
+
+		function hideNotification() {
+		    document.getElementById("notifications").style.visibility = "hidden";
+		}
+		
+		function showNotification(note, waitTime) {
+		    document.getElementById("notifications").innerHTML = note;
+		    document.getElementById("notifications").style.visibility = "visible";
+		    if (waitTime > 0) {
+		        //setTimeout(hideNotification, waitTime);
+		    } else {
+		        setTimeout(hideNotification, 1500);
+		    }
+		}
+		
+		window.addEventListener("load", function(e) {
+			let notif = document.createElement("div");
+			notif.setAttribute("id", "notifications");
+			document.body.append(notif);
+		});
+
                 function getCookie(cookieName) {
                         let name = cookieName + "=";
                         let decodedCookie = decodeURIComponent(document.cookie);
@@ -90,7 +118,26 @@
 
 		}
 
+		function pullCheck() {
+			fetch(`/pullcheck?session=${sessionId}`, {
+				cache: "no-cache", 
+				headers: {"Content-Type": "application/json"}
+			})
+			.then((data) => data.json())
+			.then((content) => {
+				console.log(content);
+				if (data.status == 0) {
+					setTimeout(pullCheck, 5000);
+				} else {
+					document.getElementById("pullButton").classList.remove('buttonBusy');
+					pullContent();
+				}
+			});
+		}
+
 		function pull() {
+			document.getElementById("pullButton").classList.add('buttonBusy');
+
 			let data = {
 				"session": sessionId,
 				"pull": 1,
@@ -108,7 +155,9 @@
 			.then((content) => {
 				console.log(content);
 				if (data.status == 1) {
-					pullContent();
+					showNotification("Pulling...");
+				} else {
+					showNotification("Pull request failed");
 				}
 			});
 		}
