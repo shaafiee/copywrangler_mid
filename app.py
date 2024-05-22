@@ -105,9 +105,8 @@ async def landing():
 		return htmlData
 
 
-@app.post('/checkpull')
-def checkPull(scope: PullScope):
-	session = scope.session
+@app.get('/checkpull')
+def checkPull(session):
 	if session is not None or len(session) < 1:
 		session = re.sub(r"('|;)", "", session)
 	else:
