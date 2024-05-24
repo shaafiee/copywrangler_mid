@@ -61,6 +61,16 @@
 			display: inline-block;
 		}
 
+		.input_td {
+			min-width: 450px;
+			max-width: 800px;
+		}
+
+		.input_td textarea {
+			width: 100%;
+			min-height: 200px;
+		}
+
 		.aPage {
 			margin: 1px;
 			padding: 3px;
@@ -73,7 +83,11 @@
 			border: 1px solid #f27d00;
 		}
 		
-
+		.selectedPage {
+			background: #ffffff;
+			border: 1px solid #f27d00;
+		}
+		
             #notifications {
                 background: #b61818;
                 color: #ffffff;
@@ -99,6 +113,7 @@
 
 		let langs = ['en', 'es', 'fr', 'de', 'ja'];
 		let langName = {'en': 'English', 'es': 'Spanish', 'fr': 'French', 'de': 'German', 'ja': 'Japanese'};
+		let selectedPage = 0;
 
 		function hideNotification() {
 		    document.getElementById("notifications").style.visibility = "hidden";
@@ -220,6 +235,7 @@
 						docEle.setAttribute("id", `page_${pageNow[0]}`);
 						docEle.setAttribute("class", `aPage`);
 						docEle.setAttribute("onclick", `pullTrans(${pageNow[0]}, 0)`);
+						let langsIncluded = JSON.parse(pageNow[3]);
 						docEle.innerHTML = (pageNow[2] == null || pageNow[2] == undefined) ? `${pageNow[1]}` : `${pageNow[1]} / ${pageNow[2]}`;
 						parentEle.append(docEle);
 					});
@@ -244,13 +260,14 @@
 			.then((data) => data.json())
 			.then((preContent) => {
 				console.log(preContent);
-				if (preContent['status'] == 1) {
+				if (preContent['status'] == 1 && pageId > 0) {
 					let translations = document.getElementById('translations');
 					if (translations == undefined) {
 						translations = document.createElement('div');
 						translations.setAttribute('id', 'translations');
 						document.getElementById('workingPane').append(translations);
 					}
+					translations.innerHTML = "";
 
 					let transTable = document.createElement('table');
 					transTable.setAttribute('id', 'transTable');
@@ -268,12 +285,32 @@
 
 					let content = preContent.content;
 
-					langs.forEach((lang) => {
-						Object.keys(content.pages[lang]).forEach((trKey) => {
-							//content.pages[lang][trKey]
-							
+					let textArea;
+					Object.keys(content.pages['en']).forEach((trKey) => {
+						transTr = document.createElement('tr');
+						transTable.append(transTr);
+						langs.forEach((lang) => {
+								if (lang == langs[0]) {
+									transTd = document.createElement('td');
+									transTr.append(transTd);
+									transTd.innerHTML = trKey;
+								}
+								transTd = document.createElement('td');
+								transTd.setAttribute("class", "input_td");
+								transTr.append(transTd);
+								textArea = document.createElement('textarea');
+								textArea.setAttribute("id", `${lang}___${pageId}___${trKey}`);
+								transTd.append(textArea);
+								if (content.pages.hasOwnProperty(lang) && content.pages[lang].hasOwnProperty(trKey)) {
+									textArea.innerHTML = content.pages[lang][trKey]['value'];
+								}
 						});
 					});
+					if (selectedPage > 0) {
+						document.getElementById(`page_${selectedPage}`).classList.remove('selectedPage');
+					}
+					document.getElementById(`page_${pageId}`).classList.add('selectedPage');
+					selectedPage = pageId;
 				}
 			});
 		}

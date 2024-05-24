@@ -205,7 +205,7 @@ def pullcontent(scope: PullScope):
 	collections = []
 
 	if scope.pages == 1:
-		cur.execute("select id, handle, template_suffix from page order by handle")
+		cur.execute("select id, handle, template_suffix, langs from page order by handle")
 		rows = cur.fetchall()
 		for row in rows:
 			pages.append(row)
