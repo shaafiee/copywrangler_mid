@@ -237,7 +237,7 @@ def pulltrans(scope: PullTransScope):
 
 	pageTrans = {}
 	if scope.page > 0:
-		cur.execute("select id, tr_key, tr_value, lang from translatable where resource_id = %s order by tr_key", (scope.page, ))
+		cur.execute("select id, tr_key, tr_value, lang from translatable where resource_id = %s", (scope.page, ))
 		rows = cur.fetchall()
 
 		for row in rows:
