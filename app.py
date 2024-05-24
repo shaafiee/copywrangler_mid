@@ -235,11 +235,11 @@ def pulltrans(scope: PullTransScope):
 
 	conn, cur = dbConnect()
 
-	if scope.page == 1:
+	pageTrans = {}
+	if scope.page > 0:
 		cur.execute("select id, tr_key, tr_value, lang from translatable where page_id = %s", (scope.page, ))
 		rows = cur.fetchall()
 
-		pageTrans = {}
 		for row in rows:
 			if row[3] not in pageTrans.keys():
 				pageTrans[row[3]] = {}
@@ -247,8 +247,8 @@ def pulltrans(scope: PullTransScope):
 				pageTrans[row[3]][row[1]] = {}
 			pageTrans[row[3]][row[1]] = {'id': row[0], 'value': row[2]}
 
-	if scope.collection == 1:
-		collTrans = {}
+	collTrans = {}
+	#if scope.collection == 1:
 
 	return {"status": 1, "content": {"pages": pageTrans, "collections": collTrans}}
 

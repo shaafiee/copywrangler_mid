@@ -25,9 +25,8 @@
 			cursor: pointer;
 		}
 
-		#buttonBusy {
-			cursor: wait !important;
-			background: #ed558a;
+		.buttonBusy {
+			background-color: #ed558a;
 		}
 
                 #pageCollDiv {
@@ -62,9 +61,44 @@
 			display: inline-block;
 		}
 
+		.aPage {
+			margin: 1px;
+			padding: 3px;
+			cursor: pointer;
+			border: 1px solid transparent;
+		}
+
+		.aPage:hover {
+			background: #ffffff;
+			border: 1px solid #f27d00;
+		}
+		
+
+            #notifications {
+                background: #b61818;
+                color: #ffffff;
+                border-radius: 8px; 
+                font-size: 1.5em; 
+                display: block;
+                opacity: 0.8; 
+                padding: 8px; 
+                padding-left: 12px;
+                padding-right: 12px;
+                text-align: center;
+                position: fixed;
+                z-index: 99;
+                top: 20px;
+                right: 20px;
+
+                visibility: hidden;
+            }  
+
         </style>
 
         <script>
+
+		let langs = ['en', 'es', 'fr', 'de', 'ja'];
+		let langName = {'en': 'English', 'es': 'Spanish', 'fr': 'French', 'de': 'German', 'ja': 'Japanese'};
 
 		function hideNotification() {
 		    document.getElementById("notifications").style.visibility = "hidden";
@@ -80,11 +114,6 @@
 		    }
 		}
 		
-		window.addEventListener("load", function(e) {
-			let notif = document.createElement("div");
-			notif.setAttribute("id", "notifications");
-			document.body.append(notif);
-		});
 
                 function getCookie(cookieName) {
                         let name = cookieName + "=";
@@ -125,9 +154,11 @@
 			})
 			.then((data) => data.json())
 			.then((content) => {
-				console.log(content);
-				if (data.status == 0) {
-					setTimeout(pullCheck, 5000);
+				if (content['status'] == 0) {
+					window.setTimeout(pullCheck, 5000);
+					if (! document.getElementById("pullButton").classList.contains('buttonBusy')) {
+						document.getElementById("pullButton").classList.add('buttonBusy');
+					}
 				} else {
 					document.getElementById("pullButton").classList.remove('buttonBusy');
 					pullContent();
@@ -154,15 +185,16 @@
 			.then((data) => data.json())
 			.then((content) => {
 				console.log(content);
-				if (data.status == 1) {
+				if (content['status'] == 1) {
 					showNotification("Pulling...");
 				} else {
 					showNotification("Pull request failed");
 				}
+				window.setTimeout(pullCheck, 5000);
 			});
 		}
 
-		function pullcontent() {
+		function pullContent() {
 			let data = {
 				"session": sessionId,
 				"pages": 1,
@@ -177,27 +209,29 @@
 				body: JSON.stringify(data)
 			})
 			.then((data) => data.json())
-			.then((content) => {
-				console.log(content);
-				if (data.status == 1) {
+			.then((preContent) => {
+				console.log(preContent);
+				if (preContent['status'] == 1) {
+					let content = preContent.content;
 					let docEle;
 					let parentEle = document.getElementById('dataColl');
 					content.pages.forEach((pageNow) => {
 						docEle = document.createElement("div");
 						docEle.setAttribute("id", `page_${pageNow[0]}`);
 						docEle.setAttribute("class", `aPage`);
-						docEle.innerHTML = `${pageNow[1]} / ${pageNow[2]}`;
+						docEle.setAttribute("onclick", `pullTrans(${pageNow[0]}, 0)`);
+						docEle.innerHTML = (pageNow[2] == null || pageNow[2] == undefined) ? `${pageNow[1]}` : `${pageNow[1]} / ${pageNow[2]}`;
 						parentEle.append(docEle);
 					});
 				}
 			});
 		}
 
-		function pullTrans() {
+		function pullTrans(pageId = 0, collectionId = 0) {
 			let data = {
 				"session": sessionId,
-				"pages": 1,
-				"collections": 1,
+				"page": pageId,
+				"collection": collectionId,
 				"scope": ""
 			}
 
@@ -208,17 +242,49 @@
 				body: JSON.stringify(data)
 			})
 			.then((data) => data.json())
-			.then((content) => {
-				console.log(content);
-				if (data.status == 1) {
-					Object.keys(content.pages).forEach((lang) => {
+			.then((preContent) => {
+				console.log(preContent);
+				if (preContent['status'] == 1) {
+					let translations = document.getElementById('translations');
+					if (translations == undefined) {
+						translations = document.createElement('div');
+						translations.setAttribute('id', 'translations');
+						document.getElementById('workingPane').append(translations);
+					}
+
+					let transTable = document.createElement('table');
+					transTable.setAttribute('id', 'transTable');
+					translations.append(transTable);
+
+					let transTr = document.createElement('tr');
+					transTable.append(transTr);
+					let transTd = document.createElement('td');
+					transTr.append(transTd);
+					langs.forEach((lang) => {
+						transTd = document.createElement('td');
+						transTr.append(transTd);
+						transTd.innerHTML = langName[lang];
+					});
+
+					let content = preContent.content;
+
+					langs.forEach((lang) => {
 						Object.keys(content.pages[lang]).forEach((trKey) => {
-							content.pages[lang][trKey]
+							//content.pages[lang][trKey]
+							
 						});
 					});
 				}
 			});
 		}
+
+		window.addEventListener("load", function(e) {
+			let notif = document.createElement("div");
+			notif.setAttribute("id", "notifications");
+			document.body.append(notif);
+			pullContent();
+			window.setTimeout(pullCheck, 500);
+		});
 
         </script>
 </head>
