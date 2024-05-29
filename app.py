@@ -211,17 +211,52 @@ def pullcontent(scope: PullScope):
 			pages.append(row)
 
 	if scope.collections == 1:
-		collections = []
+		cur.execute("select id, handle, title, langs from collection order by handle")
+		rows = cur.fetchall()
+		for row in rows:
+			collections.append(row)
 
 	return {"status": 1, "content": {"pages": pages, "collections": collections}}
 
 
 @app.post('/pulltrans')
 def pulltrans(scope: PullTransScope):
-	if scope.page == 0 and scope.collection == 0:
+	if scope.resource == 0:
 		return {"status": 0, "error": "must specify a resource"}
 
 	session = scope.session
+	if session is not None or len(session) < 1:
+		session = re.sub(r"('|;)", "", session)
+	else:
+		return {"status": 0, "error": "session key not found"}
+
+	cw_conn, cw_cur = cwDbConnect()
+
+	userId, firstName = cwCheckSession(cw_conn, cw_cur, session)
+	if not userId:
+		return {"status": 0, "error": "could not verify session"}
+
+	conn, cur = dbConnect()
+
+	resourceTrans = {}
+	if scope.resource > 0:
+		cur.execute("select id, tr_key, tr_value, lang from translatable where resource_id = %s", (scope.resource, ))
+		rows = cur.fetchall()
+
+		for row in rows:
+			if row[3] not in resourceTrans.keys():
+				resourceTrans[row[3]] = {}
+			if row[1] not in pageTrans[row[3]].keys():
+				resourceTrans[row[3]][row[1]] = {}
+			resourceTrans[row[3]][row[1]] = {'id': row[0], 'value': row[2]}
+
+	#if scope.collection == 1:
+
+	return {"status": 1, "content": {"pages": resourceTrans}}
+
+
+@app.get('/pagescsv')
+def pagesCSV(session: str):
 	if session is not None or len(session) < 1:
 		session = re.sub(r"('|;)", "", session)
 	else:

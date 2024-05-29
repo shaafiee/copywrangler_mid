@@ -9,6 +9,7 @@
                         border: 0 0 0 0;
                         padding: 0 0 0 0;
                         background: #a0a0a0;
+			font-family: verdana;
                 }
 
 		#outer {
@@ -49,6 +50,12 @@
 			border: 0 0 0 0;
 		}
 
+		.divider {
+			margin-top: 1px;
+			font-weight: 600;
+			border-bottom: 1px solid #666666;
+		}
+
                 .button {
                         margin: auto;
                         height: 50px;
@@ -76,6 +83,40 @@
 			padding: 3px;
 			cursor: pointer;
 			border: 1px solid transparent;
+			line-height: 1.2em;
+		}
+
+		.aColl {
+			margin: 1px;
+			padding: 3px;
+			cursor: pointer;
+			border: 1px solid transparent;
+			line-height: 1.2em;
+		}
+
+		.langsDiv {
+			line-height: .9em;
+			background: #71cc58;
+			border-radius: .4em;
+			padding: .2em;
+			padding-right: 2px;
+			display: inline-block;
+		}
+
+		.langsIncomplete {
+			background: #cc5890;
+		}
+
+		.langsEle {
+			background: #ffffff;
+			border-radius: .5em;
+			display: inline-block;
+			padding: 1px;
+			padding-right: 3px;
+			padding-left: 3px;
+			margin-right: 2px;
+			margin-left: 2px;
+			font-size: .8em;
 		}
 
 		.aPage:hover {
@@ -229,25 +270,80 @@
 				if (preContent['status'] == 1) {
 					let content = preContent.content;
 					let docEle;
-					let parentEle = document.getElementById('dataColl');
+					let preParentEle = document.getElementById('dataColl');
+					let langsIncluded = [];
+					let parentEle;
+					let langsDiv;
+					let langsEle;
+					docEle = document.createElement("div");
+					docEle.setAttribute("id", `page_divider`);
+					docEle.setAttribute("class", `divider`);
+					preParentEle.append(docEle);
+					docEle.innerHTML = "Pages";
+
+					parentEle = document.createElement("div");
+					parentEle.setAttribute("id", `page_content`);
+					preParentEle.append(parenEle);
 					content.pages.forEach((pageNow) => {
 						docEle = document.createElement("div");
 						docEle.setAttribute("id", `page_${pageNow[0]}`);
 						docEle.setAttribute("class", `aPage`);
-						docEle.setAttribute("onclick", `pullTrans(${pageNow[0]}, 0)`);
-						let langsIncluded = JSON.parse(pageNow[3]);
+						docEle.setAttribute("onclick", `pullTrans(${pageNow[0]})`);
+						langsIncluded = (pageNow[3] == undefined || pageNow[3] == null) ? [] : pageNow[3].split("|");
 						docEle.innerHTML = (pageNow[2] == null || pageNow[2] == undefined) ? `${pageNow[1]}` : `${pageNow[1]} / ${pageNow[2]}`;
+						langsDiv = document.createElement("div");
+						langsDiv.setAttribute("class", "langsDiv");
+						docEle.prepend(langsDiv);
+						langsIncluded.forEach((langIncluded) => {
+							langsEle = document.createElement("div");
+							langsEle.setAttribute("class", "langsEle");
+							langsDiv.append(langsEle);
+							langsEle.innerHTML = langIncluded;
+						});
+						if (langsIncluded.length != langs.length) {
+							langsDiv.classList.add('langsIncomplete');
+						}
+						parentEle.append(docEle);
+					});
+
+					docEle = document.createElement("div");
+					docEle.setAttribute("id", `collection_divider`);
+					docEle.setAttribute("class", `divider`);
+					preParentEle.prepend(docEle);
+					docEle.innerHTML = "Collections";
+
+					parentEle = document.createElement("div");
+					parentEle.setAttribute("id", `page_content`);
+					preParentEle.append(parenEle);
+					content.collections.forEach((pageNow) => {
+						docEle = document.createElement("div");
+						docEle.setAttribute("id", `coll_${pageNow[0]}`);
+						docEle.setAttribute("class", `aColl`);
+						docEle.setAttribute("onclick", `pullTrans(${pageNow[0]})`);
+						langsIncluded = (pageNow[3] == undefined || pageNow[3] == null) ? [] : pageNow[3].split("|");
+						docEle.innerHTML = (pageNow[2] == null || pageNow[2] == undefined) ? `${pageNow[1]}` : `${pageNow[1]} / ${pageNow[2]}`;
+						langsDiv = document.createElement("div");
+						langsDiv.setAttribute("class", "langsDiv");
+						docEle.prepend(langsDiv);
+						langsIncluded.forEach((langIncluded) => {
+							langsEle = document.createElement("div");
+							langsEle.setAttribute("class", "langsEle");
+							langsDiv.append(langsEle);
+							langsEle.innerHTML = langIncluded;
+						});
+						if (langsIncluded.length != langs.length) {
+							langsDiv.classList.add('langsIncomplete');
+						}
 						parentEle.append(docEle);
 					});
 				}
 			});
 		}
 
-		function pullTrans(pageId = 0, collectionId = 0) {
+		function pullTrans(resourceId = 0) {
 			let data = {
 				"session": sessionId,
-				"page": pageId,
-				"collection": collectionId,
+				"resource": resourceId,
 				"scope": ""
 			}
 
