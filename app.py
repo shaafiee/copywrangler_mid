@@ -246,7 +246,7 @@ def pulltrans(scope: PullTransScope):
 		for row in rows:
 			if row[3] not in resourceTrans.keys():
 				resourceTrans[row[3]] = {}
-			if row[1] not in pageTrans[row[3]].keys():
+			if row[1] not in resourceTrans[row[3]].keys():
 				resourceTrans[row[3]][row[1]] = {}
 			resourceTrans[row[3]][row[1]] = {'id': row[0], 'value': row[2]}
 

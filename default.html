@@ -271,12 +271,14 @@
 					let content = preContent.content;
 					let docEle;
 					let preParentEle = document.getElementById('dataColl');
+					preParentEle.innerHTML = "";
 					let langsIncluded = [];
 					let parentEle;
 					let langsDiv;
 					let langsEle;
 					docEle = document.createElement("div");
 					docEle.setAttribute("id", `page_divider`);
+					docEle.setAttribute("onclick", `togglePages()`);
 					docEle.setAttribute("class", `divider`);
 					preParentEle.append(docEle);
 					docEle.innerHTML = "Pages";
@@ -309,11 +311,12 @@
 					docEle = document.createElement("div");
 					docEle.setAttribute("id", `collection_divider`);
 					docEle.setAttribute("class", `divider`);
+					docEle.setAttribute("onclick", `toggleCollections()`);
 					preParentEle.append(docEle);
 					docEle.innerHTML = "Collections";
 
 					parentEle = document.createElement("div");
-					parentEle.setAttribute("id", `page_content`);
+					parentEle.setAttribute("id", `collection_content`);
 					preParentEle.append(parentEle);
 					content.collections.forEach((pageNow) => {
 						docEle = document.createElement("div");
@@ -340,6 +343,32 @@
 			});
 		}
 
+		let pagesVisible = true;
+		function togglePages() {
+			if (pagesVisible) {
+				document.getElementById('page_content').style.visibility = 'hidden';
+				document.getElementById('page_content').style.display = 'none';
+				pagesVisible = false;
+			} else {
+				document.getElementById('page_content').style.visibility = 'visible';
+				document.getElementById('page_content').style.display = 'block';
+				pagesVisible = true;
+			}
+		}
+
+		let collectionsVisible = true;
+		function toggleCollections() {
+			if (collectionsVisible) {
+				document.getElementById('collection_content').style.visibility = 'hidden';
+				document.getElementById('collection_content').style.display = 'none';
+				collectionsVisible = false;
+			} else {
+				document.getElementById('collection_content').style.visibility = 'visible';
+				document.getElementById('collection_content').style.display = 'block';
+				collectionsVisible = true;
+			}
+		}
+
 		function pullTrans(resourceId = 0) {
 			let data = {
 				"session": sessionId,
@@ -356,7 +385,7 @@
 			.then((data) => data.json())
 			.then((preContent) => {
 				console.log(preContent);
-				if (preContent['status'] == 1 && pageId > 0) {
+				if (preContent['status'] == 1 && resourceId > 0) {
 					let translations = document.getElementById('translations');
 					if (translations == undefined) {
 						translations = document.createElement('div');
