@@ -283,7 +283,7 @@
 
 					parentEle = document.createElement("div");
 					parentEle.setAttribute("id", `page_content`);
-					preParentEle.append(parenEle);
+					preParentEle.append(parentEle);
 					content.pages.forEach((pageNow) => {
 						docEle = document.createElement("div");
 						docEle.setAttribute("id", `page_${pageNow[0]}`);
@@ -309,12 +309,12 @@
 					docEle = document.createElement("div");
 					docEle.setAttribute("id", `collection_divider`);
 					docEle.setAttribute("class", `divider`);
-					preParentEle.prepend(docEle);
+					preParentEle.append(docEle);
 					docEle.innerHTML = "Collections";
 
 					parentEle = document.createElement("div");
 					parentEle.setAttribute("id", `page_content`);
-					preParentEle.append(parenEle);
+					preParentEle.append(parentEle);
 					content.collections.forEach((pageNow) => {
 						docEle = document.createElement("div");
 						docEle.setAttribute("id", `coll_${pageNow[0]}`);
