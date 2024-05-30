@@ -279,8 +279,8 @@ def compileCSV(rows):
 	return csv
 
 
-@app.get('/pagescsv')
-def pagesCSV(session: str):
+@app.get('/pagecsv')
+def pageCSV(session: str):
 	if session is not None or len(session) < 1:
 		session = re.sub(r"('|;)", "", session)
 	else:
