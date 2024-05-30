@@ -271,7 +271,10 @@ def compileCSV(rows):
 				csv = f"{csv}{preJoin}\n"
 				current = []
 			currentKey = row[3]
-			current = [str(row[0]), str(row[1]), '"' + row[2] + '"', '"' + row[3] + '"', '"' + row[4] + '"']
+			theHandle = row[2] if row[2] is not None else ""
+			theKey = row[3] if row[3] is not None else ""
+			theValue = row[4] if row[4] is not None else ""
+			current = [str(row[0]), str(row[1]), '"' + theHandle + '"', '"' + theKey + '"', '"' + theValue + '"']
 		else:
 			current.append('"' + row[4] + '"')
 		csvLangs.append(row[-1])
