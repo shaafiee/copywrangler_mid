@@ -458,7 +458,7 @@
 								transTd.setAttribute("class", "input_td");
 								transTr.append(transTd);
 								textArea = document.createElement('textarea');
-								textArea.setAttribute("id", `${lang}___${pageId}___${trKey}`);
+								textArea.setAttribute("id", `${lang}___${resourceId}___${trKey}`);
 								transTd.append(textArea);
 								if (content.pages.hasOwnProperty(lang) && content.pages[lang].hasOwnProperty(trKey)) {
 									textArea.innerHTML = content.pages[lang][trKey]['value'];
@@ -468,8 +468,8 @@
 					if (selectedPage > 0) {
 						document.getElementById(`page_${selectedPage}`).classList.remove('selectedPage');
 					}
-					document.getElementById(`page_${pageId}`).classList.add('selectedPage');
-					selectedPage = pageId;
+					document.getElementById(`page_${resourceId}`).classList.add('selectedPage');
+					selectedPage = resourceId;
 				}
 			});
 		}
