@@ -283,6 +283,13 @@
 					preParentEle.append(docEle);
 					docEle.innerHTML = "Pages";
 
+					subDocEle = document.createElement("div");
+					subDocEle.setAttribute("id", `page_csv);
+					subDocEle.setAttribute("class", `csv`);
+					subDocEle.setAttribute("onclick", `pageCSV()`);
+					docEle.append(subDocEle);
+					subDocEle.innerHTML = "Get CSV";
+
 					parentEle = document.createElement("div");
 					parentEle.setAttribute("id", `page_content`);
 					preParentEle.append(parentEle);
@@ -438,6 +445,24 @@
 					selectedPage = pageId;
 				}
 			});
+		}
+
+		function pageCSV() {
+			fetch(`/pagecsv?session=${sessionId}`, {
+				method: "GET", 
+				cache: "no-cache", 
+			});
+
+			/*.then((data) => data.json())
+			.then((content) => {
+				console.log(content);
+				if (content['status'] == 1) {
+					showNotification("Pulling...");
+				} else {
+					showNotification("Pull request failed");
+				}
+				window.setTimeout(pullCheck, 5000);
+			});*/
 		}
 
 		window.addEventListener("load", function(e) {
