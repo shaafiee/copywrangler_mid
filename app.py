@@ -294,7 +294,7 @@ def pageCSV(session: str):
 
 	conn, cur = dbConnect()
 
-	cur.execute("select page.id, translatable.id, page.handle, tr_key, tr_value, lang from page right join translatable on resource_id = page.id group by resource_id, tr_key, lang order by resource_id, tr_key, lang")
+	cur.execute("select page.id, translatable.id, page.handle, tr_key, tr_value, lang from page right join translatable on resource_id = page.id order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
 	csv = compileCSV(rows)
 
