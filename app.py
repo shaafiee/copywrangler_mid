@@ -267,7 +267,7 @@ def compileCSV(rows):
 			if currentKey is None:
 				langsComposed = True
 			else:
-				csv = csv + ','.join(current) + "\n"
+				csv = csv + ','.join(current) + '\n'
 				current = []
 			currentKey = row[3]
 			current = [row[0], row[1], '"' + row[2] + '"', '"' + row[3] + '"', '"' + row[4] + '"']
@@ -275,7 +275,7 @@ def compileCSV(rows):
 			current.append('"' + row[4] + '"')
 		csvLangs.append(row[-1])
 	header = ["", "", "", ""] + csvLangs
-	csv = ','.join(header) + "\n" + csv
+	csv = ','.join(header) + '\n' + csv
 	return csv
 
 
