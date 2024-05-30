@@ -50,10 +50,19 @@
 			border: 0 0 0 0;
 		}
 
-		.divider {
+		.divider_outer {
 			margin-top: 1px;
 			font-weight: 600;
 			border-bottom: 1px solid #666666;
+		}
+
+		.divider {
+			display: inline-block;
+		}
+
+		.csv {
+			float: right;
+			display: inline-block;
 		}
 
                 .button {
@@ -278,10 +287,15 @@
 					let langsEle;
 					docEle = document.createElement("div");
 					docEle.setAttribute("id", `page_divider`);
-					docEle.setAttribute("onclick", `togglePages()`);
-					docEle.setAttribute("class", `divider`);
+					subDocEle.setAttribute("class", `divider_outer`);
 					preParentEle.append(docEle);
-					docEle.innerHTML = "Pages";
+
+					subDocEle = document.createElement("div");
+					subDocEle.setAttribute("id", `page_label`);
+					subDocEle.setAttribute("onclick", `togglePages()`);
+					subDocEle.setAttribute("class", `divider`);
+					docEle.append(subDocEle);
+					subDocEle.innerHTML = "Pages";
 
 					subDocEle = document.createElement("div");
 					subDocEle.setAttribute("id", `page_csv`);
@@ -317,10 +331,22 @@
 
 					docEle = document.createElement("div");
 					docEle.setAttribute("id", `collection_divider`);
-					docEle.setAttribute("class", `divider`);
-					docEle.setAttribute("onclick", `toggleCollections()`);
+					subDocEle.setAttribute("class", `divider_outer`);
 					preParentEle.append(docEle);
-					docEle.innerHTML = "Collections";
+
+					subDocEle = document.createElement("div");
+					subDocEle.setAttribute("id", `collection_label`);
+					subDocEle.setAttribute("onclick", `toggleCollections()`);
+					subDocEle.setAttribute("class", `divider`);
+					docEle.append(subDocEle);
+					subDocEle.innerHTML = "Collections";
+
+					subDocEle = document.createElement("div");
+					subDocEle.setAttribute("id", `collection_csv`);
+					subDocEle.setAttribute("class", `csv`);
+					subDocEle.setAttribute("onclick", `collectionCSV()`);
+					docEle.append(subDocEle);
+					subDocEle.innerHTML = "Get CSV";
 
 					parentEle = document.createElement("div");
 					parentEle.setAttribute("id", `collection_content`);
