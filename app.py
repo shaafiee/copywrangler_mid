@@ -14,7 +14,7 @@ from account_lib import *
 from db_lib import *
 #from email.mime.text import MIMEText
 #from email.mime.multipart import MIMEMultipart
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 #from fluidcrypt.fluidcrypt import *
 from gcp_secrets.secrets import getSecret
 import requests
@@ -255,6 +255,30 @@ def pulltrans(scope: PullTransScope):
 	return {"status": 1, "content": {"pages": resourceTrans}}
 
 
+def compileCSV(rows):
+	csv = ""
+	csvLangs = []
+	currentValues = []
+	current = []
+	currentKey = None
+	langsComposed = False
+	for row in rows:
+		if row[0] != currentKey:
+			if currentKey is None:
+				langsComposed = True
+			else:
+				csv = csv + ','.join(current) + "\n"
+				current = []
+			currentKey = row[9]
+			current = [row[0], row[1], '"' + row[2] + '"', '"' + row[3] + '"', '"' + row[4] + '"']
+		else:
+			current.append('"' + row[4] + '"')
+		csvLangs.append(row[-1])
+	header = ["", "", "", ""] + csvLangs
+	csv = ','.join(header) + "\n" + csv
+	return csv
+
+
 @app.get('/pagescsv')
 def pagesCSV(session: str):
 	if session is not None or len(session) < 1:
@@ -270,22 +294,11 @@ def pagesCSV(session: str):
 
 	conn, cur = dbConnect()
 
-	pageTrans = {}
-	if scope.page > 0:
-		cur.execute("select id, tr_key, tr_value, lang from translatable where resource_id = %s", (scope.page, ))
-		rows = cur.fetchall()
+	cur.execute("select page.id, translatable.id, page.handle, tr_key, tr_value, lang from page right join translatable on resource_id = page.id group by resource_id, tr_key, lang order by resource_id, tr_key, lang", (scope.page, ))
+	rows = cur.fetchall()
+	csv = compileCSV(rows)
 
-		for row in rows:
-			if row[3] not in pageTrans.keys():
-				pageTrans[row[3]] = {}
-			if row[1] not in pageTrans[row[3]].keys():
-				pageTrans[row[3]][row[1]] = {}
-			pageTrans[row[3]][row[1]] = {'id': row[0], 'value': row[2]}
-
-	collTrans = {}
-	#if scope.collection == 1:
-
-	return {"status": 1, "content": {"pages": pageTrans, "collections": collTrans}}
+	return Response(content=csv, media_type="text/csv")
 
 
 if __name__ == '__main__':
