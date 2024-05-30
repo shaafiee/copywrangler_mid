@@ -269,7 +269,7 @@ def compileCSV(rows):
 			else:
 				csv = csv + ','.join(current) + "\n"
 				current = []
-			currentKey = row[9]
+			currentKey = row[3]
 			current = [row[0], row[1], '"' + row[2] + '"', '"' + row[3] + '"', '"' + row[4] + '"']
 		else:
 			current.append('"' + row[4] + '"')
