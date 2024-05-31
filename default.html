@@ -58,11 +58,11 @@
 		}
 
 		#page_divider {
-			color: #082966;
+			color: #152f40;
 		}
 
 		#page_content {
-			background: #abc8ff;
+			background: #c0e4fa;
 		}
 
 		#collection_divider {
@@ -445,6 +445,7 @@
 				"session": sessionId,
 				"resource": selectedResource,
 				"trKey": selectedKey,
+				"lang": selectedLang,
 				"trValue": document.getElementById(`${selectedLang}___${selectedResource}___${selectedKey}`).value
 			}
 
@@ -465,7 +466,7 @@
 		}
 
 		function syncChange(evt) {
-			let splits = evt.target.id.split("___");
+			let splits = evt.split("___");
 			selectedLang = splits[0];
 			selectedResource = splits[1];
 			selectedKey = splits[2];
@@ -533,7 +534,7 @@
 								textArea = document.createElement('textarea');
 								textArea.setAttribute("id", `${lang}___${resourceId}___${trKey}`);
 
-								textArea.setAttribute("onkeyup", `syncChange()`);
+								textArea.setAttribute("onkeyup", `syncChange("${lang}___${resourceId}___${trKey}")`);
 								transTd.append(textArea);
 								if (content.pages.hasOwnProperty(lang) && content.pages[lang].hasOwnProperty(trKey)) {
 									textArea.innerHTML = content.pages[lang][trKey]['value'];

@@ -262,13 +262,15 @@ def compileCSV(rows):
 	current = []
 	currentKey = None
 	langsComposed = False
+	body = []
 	for row in rows:
 		if row[0] != currentKey:
 			if currentKey is None:
 				langsComposed = True
 			else:
-				preJoin = ','.join(current)
-				csv = f"{csv}{preJoin}\n"
+				#preJoin = ','.join(current)
+				body.append(current)
+				#csv = f"{csv}{preJoin}\n"
 				current = []
 			currentKey = row[3]
 			theHandle = row[2] if row[2] is not None else ""
@@ -278,10 +280,10 @@ def compileCSV(rows):
 		else:
 			current.append('"' + row[4] + '"')
 		csvLangs.append(row[-1])
-	header = ["", "", "", ""] + csvLangs
-	preJoin = ','.join(header)
-	csv = f"{preJoin}\n{csv}"
-	return csv
+	#header = ["", "", "", ""] + csvLangs
+	#preJoin = ','.join(header)
+	#csv = f"{preJoin}\n{csv}"
+	return body
 
 
 @app.get('/pagecsv')
@@ -301,9 +303,27 @@ def pageCSV(session: str):
 
 	cur.execute("select page.id, translatable.id, page.handle, tr_key, tr_value, lang from page right join translatable on resource_id = page.id order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
-	csv = compileCSV(rows)
 
-	return Response(content=csv, media_type="text/csv")
+	title = "Pages in Shopify"
+
+	#gsheetId = getSecret("gsheetId")
+	scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+	creds = service_account.Credentials.from_service_account_file("gsheetapi.json", scopes=scopes)
+	service = build("sheets", "v4", credentials=creds)
+	spreadsheet = {"properties": {"title": title}}
+	spreadsheet = (service.spreadsheets().create(body=spreadsheet, fields="spreadsheetId").execute())
+	
+	body = compileCSV(rows)
+
+	lines = len(body)
+	columns = len(body[0])
+	endColumn = chr(41 + columns)
+	rangeName = f"A1:{endColumn}{lines}"
+
+	gsheetid = spreadsheet.get("spreadsheetId")
+	result = (service.spreadsheets().values().update(spreadsheetId=gsheetid, range=rangeName, valueInputOption="USER_ENTERED", body=body))
+
+	return {"status": 1, "gsheet": gsheetid}
 
 
 @app.post('/updatetrans')
