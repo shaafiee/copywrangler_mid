@@ -50,7 +50,7 @@
 			border: 0 0 0 0;
 		}
 
-		.divider {
+		.divider_outer {
 			margin-top: 1px;
 			font-weight: 600;
 			border-bottom: 1px solid #666666;
@@ -73,6 +73,29 @@
 			background: #b7f2b3;
 		}
 
+		.divider {
+			display: inline-block;
+			padding: .2em;
+			border-radius: .2em;
+			cursor: pointer;
+		}
+
+		.csv {
+			margin-left: .4em;
+			float: right;
+			display: inline-block;
+			padding: .2em;
+			border-radius: .2em;
+			cursor: pointer;
+		}
+
+		.divider:hover {
+			background: #ffffff;
+		}
+
+		.csv:hover {
+			background: #ffffff;
+		}
 
                 .button {
                         margin: auto;
@@ -294,12 +317,25 @@
 					let parentEle;
 					let langsDiv;
 					let langsEle;
+					let subDocEle;
 					docEle = document.createElement("div");
 					docEle.setAttribute("id", `page_divider`);
-					docEle.setAttribute("onclick", `togglePages()`);
-					docEle.setAttribute("class", `divider`);
+					docEle.setAttribute("class", `divider_outer`);
 					preParentEle.append(docEle);
-					docEle.innerHTML = "Pages";
+
+					subDocEle = document.createElement("div");
+					subDocEle.setAttribute("id", `page_label`);
+					subDocEle.setAttribute("onclick", `togglePages()`);
+					subDocEle.setAttribute("class", `divider`);
+					docEle.append(subDocEle);
+					subDocEle.innerHTML = "Pages";
+
+					subDocEle = document.createElement("div");
+					subDocEle.setAttribute("id", `page_csv`);
+					subDocEle.setAttribute("class", `csv`);
+					subDocEle.setAttribute("onclick", `pageCSV()`);
+					docEle.append(subDocEle);
+					subDocEle.innerHTML = "Get CSV";
 
 					parentEle = document.createElement("div");
 					parentEle.setAttribute("id", `page_content`);
@@ -328,10 +364,22 @@
 
 					docEle = document.createElement("div");
 					docEle.setAttribute("id", `collection_divider`);
-					docEle.setAttribute("class", `divider`);
-					docEle.setAttribute("onclick", `toggleCollections()`);
+					docEle.setAttribute("class", `divider_outer`);
 					preParentEle.append(docEle);
-					docEle.innerHTML = "Collections";
+
+					subDocEle = document.createElement("div");
+					subDocEle.setAttribute("id", `collection_label`);
+					subDocEle.setAttribute("onclick", `toggleCollections()`);
+					subDocEle.setAttribute("class", `divider`);
+					docEle.append(subDocEle);
+					subDocEle.innerHTML = "Collections";
+
+					subDocEle = document.createElement("div");
+					subDocEle.setAttribute("id", `collection_csv`);
+					subDocEle.setAttribute("class", `csv`);
+					subDocEle.setAttribute("onclick", `collectionCSV()`);
+					docEle.append(subDocEle);
+					subDocEle.innerHTML = "Get CSV";
 
 					parentEle = document.createElement("div");
 					parentEle.setAttribute("id", `collection_content`);
@@ -491,6 +539,24 @@
 					selectedPage = resourceId;
 				}
 			});
+		}
+
+		function pageCSV() {
+			fetch(`/pagecsv?session=${sessionId}`, {
+				method: "GET", 
+				cache: "no-cache", 
+			});
+
+			/*.then((data) => data.json())
+			.then((content) => {
+				console.log(content);
+				if (content['status'] == 1) {
+					showNotification("Pulling...");
+				} else {
+					showNotification("Pull request failed");
+				}
+				window.setTimeout(pullCheck, 5000);
+			});*/
 		}
 
 		window.addEventListener("load", function(e) {

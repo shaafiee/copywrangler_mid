@@ -14,7 +14,7 @@ from account_lib import *
 from db_lib import *
 #from email.mime.text import MIMEText
 #from email.mime.multipart import MIMEMultipart
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 #from fluidcrypt.fluidcrypt import *
 from gcp_secrets.secrets import getSecret
 import requests
@@ -255,8 +255,37 @@ def pulltrans(scope: PullTransScope):
 	return {"status": 1, "content": {"pages": resourceTrans}}
 
 
-@app.get('/pagescsv')
-def pagesCSV(session: str):
+def compileCSV(rows):
+	csv = ""
+	csvLangs = []
+	currentValues = []
+	current = []
+	currentKey = None
+	langsComposed = False
+	for row in rows:
+		if row[0] != currentKey:
+			if currentKey is None:
+				langsComposed = True
+			else:
+				preJoin = ','.join(current)
+				csv = f"{csv}{preJoin}\n"
+				current = []
+			currentKey = row[3]
+			theHandle = row[2] if row[2] is not None else ""
+			theKey = row[3] if row[3] is not None else ""
+			theValue = row[4] if row[4] is not None else ""
+			current = [str(row[0]), str(row[1]), '"' + theHandle + '"', '"' + theKey + '"', '"' + theValue + '"']
+		else:
+			current.append('"' + row[4] + '"')
+		csvLangs.append(row[-1])
+	header = ["", "", "", ""] + csvLangs
+	preJoin = ','.join(header)
+	csv = f"{preJoin}\n{csv}"
+	return csv
+
+
+@app.get('/pagecsv')
+def pageCSV(session: str):
 	if session is not None or len(session) < 1:
 		session = re.sub(r"('|;)", "", session)
 	else:
@@ -270,22 +299,11 @@ def pagesCSV(session: str):
 
 	conn, cur = dbConnect()
 
-	pageTrans = {}
-	if scope.page > 0:
-		cur.execute("select id, tr_key, tr_value, lang from translatable where resource_id = %s", (scope.page, ))
-		rows = cur.fetchall()
+	cur.execute("select page.id, translatable.id, page.handle, tr_key, tr_value, lang from page right join translatable on resource_id = page.id order by resource_id, tr_key, lang")
+	rows = cur.fetchall()
+	csv = compileCSV(rows)
 
-		for row in rows:
-			if row[3] not in pageTrans.keys():
-				pageTrans[row[3]] = {}
-			if row[1] not in pageTrans[row[3]].keys():
-				pageTrans[row[3]][row[1]] = {}
-			pageTrans[row[3]][row[1]] = {'id': row[0], 'value': row[2]}
-
-	collTrans = {}
-	#if scope.collection == 1:
-
-	return {"status": 1, "content": {"pages": pageTrans, "collections": collTrans}}
+	return Response(content=csv, media_type="text/csv")
 
 
 @app.post('/updatetrans')
