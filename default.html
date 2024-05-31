@@ -464,7 +464,11 @@
 			});
 		}
 
-		function syncChange() {
+		function syncChange(evt) {
+			let splits = evt.target.id.split("___");
+			selectedLang = splits[0];
+			selectedResource = splits[1];
+			selectedKey = splits[2];
 			if (changeTimer) {
 				clearTimeout(changeTimer);
 			}
@@ -528,10 +532,8 @@
 								transTr.append(transTd);
 								textArea = document.createElement('textarea');
 								textArea.setAttribute("id", `${lang}___${resourceId}___${trKey}`);
-								selectedLang = lang;
-								selectedResource = resourceId;
-								selectedKey = trKey;
-								textArea.setAttribute("onchange", `syncChange()`);
+
+								textArea.setAttribute("onkeyup", `syncChange()`);
 								transTd.append(textArea);
 								if (content.pages.hasOwnProperty(lang) && content.pages[lang].hasOwnProperty(trKey)) {
 									textArea.innerHTML = content.pages[lang][trKey]['value'];

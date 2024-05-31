@@ -322,7 +322,7 @@ def updateTrans(scope: UpdateTrans):
 
 	conn, cur = dbConnect()
 
-	cur.execute("update translatable set tr_value = %s where resource_id = %s and tr_key = %s", (scope.trValue, scope.resource, scope.trKey))
+	cur.execute("update translatable set tr_value = %s where resource_id = %s and tr_key = %s and lang = %s", (scope.trValue, scope.resource, scope.trKey, scope.lang))
 	conn.commit()
 	return {"status": 1, "content": "saved"}
 

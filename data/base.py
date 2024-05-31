@@ -28,3 +28,4 @@ class UpdateTrans(BaseModel):
 	resource: int
 	trKey: str
 	trValue: str
+	lang: str
