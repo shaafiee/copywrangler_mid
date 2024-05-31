@@ -445,10 +445,10 @@
 				"session": sessionId,
 				"resource": selectedResource,
 				"trKey": selectedKey,
-				"trValue": selectedValue
+				"trValue": document.getElementById(`${selectedLang}___${selectedResource}___${selectedKey}`).value
 			}
 
-			fetch("/pulltrans", {
+			fetch("/updatetrans", {
 				method: "POST", 
 				cache: "no-cache", 
 				headers: {"Content-Type": "application/json"},
@@ -456,14 +456,20 @@
 			})
 			.then((data) => data.json())
 			.then((preContent) => {
-			showNotification("Change synced");
+				if (preContent["status"] == 1) {
+					showNotification("Change synced");
+				} else {
+					showNotification("Could not save changes");
+				}
+			});
 		}
 
 		function syncChange() {
 			if (changeTimer) {
 				clearTimeout(changeTimer);
 			}
-			changeTimer = window.setTimeout(doChange, 2000)
+			changeTimer = window.setTimeout(doChange, 2000);
+			hideNotification();
 		}
 
 		function pullTrans(resourceId = 0) {

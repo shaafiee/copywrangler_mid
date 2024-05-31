@@ -308,6 +308,7 @@ def pageCSV(session: str):
 
 @app.post('/updatetrans')
 def updateTrans(scope: UpdateTrans):
+	session = scope.session
 	if session is not None or len(session) < 1:
 		session = re.sub(r"('|;)", "", session)
 	else:
