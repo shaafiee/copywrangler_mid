@@ -301,6 +301,11 @@ def pageCSV(session: str):
 
 	conn, cur = dbConnect()
 
+	service_account_info = getSecret("gsheetapi")
+	with open("gsheetapi.json", "w") as OFILE:
+		OFILE.write(service_account_info)
+	OFILE.close()
+
 	cur.execute("select page.id, translatable.id, page.handle, tr_key, tr_value, lang from page right join translatable on resource_id = page.id order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
 
