@@ -323,7 +323,8 @@ def pageCSV(session: str):
 	service = build("sheets", "v4", credentials=creds)
 	spreadsheet = {"properties": {"title": title}}
 	spreadsheet = (service.spreadsheets().create(body=spreadsheet, fields="spreadsheetId").execute())
-	
+	spreadsheet.share('', role='reader', type='anyone')
+
 	body = compileCSV(rows)
 
 	lines = len(body)
