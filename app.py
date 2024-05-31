@@ -288,6 +288,26 @@ def pagesCSV(session: str):
 	return {"status": 1, "content": {"pages": pageTrans, "collections": collTrans}}
 
 
+@app.post('/updatetrans')
+def updateTrans(scope: UpdateTrans):
+	if session is not None or len(session) < 1:
+		session = re.sub(r"('|;)", "", session)
+	else:
+		return {"status": 0, "error": "session key not found"}
+
+	cw_conn, cw_cur = cwDbConnect()
+
+	userId, firstName = cwCheckSession(cw_conn, cw_cur, session)
+	if not userId:
+		return {"status": 0, "error": "could not verify session"}
+
+	conn, cur = dbConnect()
+
+	cur.execute("update translatable set tr_value = %s where resource_id = %s and tr_key = %s", (scope.trValue, scope.resource, scope.trKey))
+	conn.commit()
+	return {"status": 1, "content": "saved"}
+
+
 if __name__ == '__main__':
 	print("STARTING")
 	GCP_PROJECT_ID = requests.get("http://metadata.google.internal/computeMetadata/v1/project/project-id")

@@ -54,7 +54,25 @@
 			margin-top: 1px;
 			font-weight: 600;
 			border-bottom: 1px solid #666666;
+			cursor: pointer;
 		}
+
+		#page_divider {
+			color: #082966;
+		}
+
+		#page_content {
+			background: #abc8ff;
+		}
+
+		#collection_divider {
+			color: #094205;
+		}
+
+		#collection_content {
+			background: #b7f2b3;
+		}
+
 
                 .button {
                         margin: auto;
@@ -320,7 +338,7 @@
 					preParentEle.append(parentEle);
 					content.collections.forEach((pageNow) => {
 						docEle = document.createElement("div");
-						docEle.setAttribute("id", `coll_${pageNow[0]}`);
+						docEle.setAttribute("id", `page_${pageNow[0]}`);
 						docEle.setAttribute("class", `aColl`);
 						docEle.setAttribute("onclick", `pullTrans(${pageNow[0]})`);
 						langsIncluded = (pageNow[3] == undefined || pageNow[3] == null) ? [] : pageNow[3].split("|");
@@ -367,6 +385,37 @@
 				document.getElementById('collection_content').style.display = 'block';
 				collectionsVisible = true;
 			}
+		}
+
+		let selectedLang;
+		let selectedResource;
+		let selectedKey;
+		let changeTimer = false;
+
+		function doChange() {
+			let data = {
+				"session": sessionId,
+				"resource": selectedResource,
+				"trKey": selectedKey,
+				"trValue": selectedValue
+			}
+
+			fetch("/pulltrans", {
+				method: "POST", 
+				cache: "no-cache", 
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify(data)
+			})
+			.then((data) => data.json())
+			.then((preContent) => {
+			showNotification("Change synced");
+		}
+
+		function syncChange() {
+			if (changeTimer) {
+				clearTimeout(changeTimer);
+			}
+			changeTimer = window.setTimeout(doChange, 2000)
 		}
 
 		function pullTrans(resourceId = 0) {
@@ -424,7 +473,11 @@
 								transTd.setAttribute("class", "input_td");
 								transTr.append(transTd);
 								textArea = document.createElement('textarea');
-								textArea.setAttribute("id", `${lang}___${pageId}___${trKey}`);
+								textArea.setAttribute("id", `${lang}___${resourceId}___${trKey}`);
+								selectedLang = lang;
+								selectedResource = resourceId;
+								selectedKey = trKey;
+								textArea.setAttribute("onchange", `syncChange()`);
 								transTd.append(textArea);
 								if (content.pages.hasOwnProperty(lang) && content.pages[lang].hasOwnProperty(trKey)) {
 									textArea.innerHTML = content.pages[lang][trKey]['value'];
@@ -434,8 +487,8 @@
 					if (selectedPage > 0) {
 						document.getElementById(`page_${selectedPage}`).classList.remove('selectedPage');
 					}
-					document.getElementById(`page_${pageId}`).classList.add('selectedPage');
-					selectedPage = pageId;
+					document.getElementById(`page_${resourceId}`).classList.add('selectedPage');
+					selectedPage = resourceId;
 				}
 			});
 		}

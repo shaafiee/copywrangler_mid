@@ -23,3 +23,8 @@ class PullTransScope(BaseModel):
 	resource: int | None = 0
 	scope: str | None = None
 
+class UpdateTrans(BaseModel):
+	session: str
+	resource: int
+	trKey: str
+	trValue: str
