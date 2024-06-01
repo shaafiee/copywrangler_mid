@@ -329,7 +329,7 @@ def pageCSV(session: str):
 	client = gspread.authorize(creds)
 	spreadsheet = client.create(title)
 
-	spreadsheet.share('', role='writer', type='anyone')
+	spreadsheet.share(None, perm_type='anyone', role='writer')
 
 	body = compileCSV(rows)
 
