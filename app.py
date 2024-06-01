@@ -262,7 +262,8 @@ def pulltrans(scope: PullTransScope):
 	return {"status": 1, "content": {"pages": resourceTrans}}
 
 
-def compileCSV(rows):
+def compileCSV(rows, isColl = False):
+	collTitle = {"title": 5, "description": 6, "body_html": 7}
 	csv = ""
 	csvLangs = []
 	currentValues = []
@@ -270,6 +271,7 @@ def compileCSV(rows):
 	currentKey = None
 	langsComposed = False
 	body = []
+	theValue = None
 	for row in rows:
 		if row[2] != currentKey:
 			if currentKey is not None:
@@ -281,8 +283,14 @@ def compileCSV(rows):
 			currentKey = row[2]
 			theHandle = row[1] if row[1] is not None else ""
 			theKey = row[2] if row[2] is not None else ""
-			theValue = row[3] if row[3] is not None else ""
-			current = [str(row[0]), '"' + theHandle + '"', '"' + theKey + '"', '"' + theValue + '"']
+			if isColl:
+				theValue = row[collTitle[theKey]] if row[collTitle[theKey]] is not None else ""
+				current = [str(row[0]), '"' + theHandle + '"', '"' + theKey + '"', '"' + theValue + '"']
+				theValue = row[3] if row[3] is not None else ""
+				current.append('"' + theValue + '"')
+			else:
+				theValue = row[3] if row[3] is not None else ""
+				current = [str(row[0]), '"' + theHandle + '"', '"' + theKey + '"', '"' + theValue + '"']
 		else:
 			theValue = row[3] if row[3] is not None else ""
 			current.append('"' + theValue + '"')
@@ -346,9 +354,9 @@ def pageCSV(session: str, category: int = 1):
 	worksheet.update(rangeName, body)
 
 
-	cur.execute("select collection.id, collection.handle, tr_key, tr_value, lang from translatable join collection on resource_id = collection.id order by resource_id, tr_key, lang")
+	cur.execute("select collection.id, collection.handle, tr_key, tr_value, lang, title, description, descriptionHtml from translatable join collection on resource_id = collection.id where tr_key not like 'handle' order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
-	body = compileCSV(rows)
+	body = compileCSV(rows, True)
 
 	lines = len(body)
 	columns = len(body[0])
