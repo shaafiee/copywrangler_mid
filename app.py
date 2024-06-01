@@ -324,6 +324,7 @@ def pageCSV(session: str):
 	#spreadsheet = {"properties": {"title": title}}
 	#spreadsheet = (service.spreadsheets().create(body=spreadsheet, fields="spreadsheetId").execute())
 
+	scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
 	creds = service_account.Credentials.from_service_account_file("gsheetapi.json", scopes=scopes)
 	client = gspread.authorize(creds)
 	spreadsheet = client.create(title)
