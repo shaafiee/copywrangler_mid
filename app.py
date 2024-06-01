@@ -284,9 +284,9 @@ def compileCSV(rows, isColl = False):
 				#csv = f"{csv}{preJoin}\n"
 				for theLang in theLangs:
 					if theLang in keyLang.keys():
-						if theColl and theLang != 'en':
+						if isColl and theLang != 'en':
 							current.append(keyLang[theLang])
-						elif not theColl:
+						elif not isColl:
 							current.append(keyLang[theLang])
 					else:
 						current.append("")
