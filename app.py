@@ -346,7 +346,7 @@ def pageCSV(session: str, category: int = 1):
 	worksheet.update(rangeName, body)
 
 
-	cur.execute("select collection.id, collection.handle, tr_key, tr_value, lang from translatable join page on resource_id = collection.id order by resource_id, tr_key, lang")
+	cur.execute("select collection.id, collection.handle, tr_key, tr_value, lang from translatable join collection on resource_id = collection.id order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
 	body = compileCSV(rows)
 
