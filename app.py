@@ -295,7 +295,7 @@ def compileCSV(rows, isColl = False):
 			theValue = row[3] if row[3] is not None else ""
 			current.append('"' + theValue + '"')
 		if row[4] not in csvLangs:
-			csvLangs.append(row[-1])
+			csvLangs.append(row[4])
 	header = ["", "", ""] + csvLangs
 	body.insert(0, header)
 	#preJoin = ','.join(header)
