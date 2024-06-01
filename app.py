@@ -289,7 +289,10 @@ def compileCSV(rows, isColl = False):
 						elif not isColl:
 							current.append(keyLang[theLang])
 					else:
-						current.append("")
+						if isColl and theLang != 'en':
+							current.append("")
+						elif not isColl:
+							current.append("")
 				current = []
 				keyLang = {}
 			currentKey = row[2]
