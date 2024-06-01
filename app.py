@@ -338,7 +338,7 @@ def pageCSV(session: str, category: int = 1):
 
 	lines = len(body)
 	columns = len(body[0])
-	endColumn = chr(41 + columns)
+	endColumn = chr(65 + columns)
 	rangeName = f"A1:{endColumn}{lines}"
 
 	#gsheetid = spreadsheet.get("spreadsheetId")
