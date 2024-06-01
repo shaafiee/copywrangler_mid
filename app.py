@@ -344,7 +344,7 @@ def pageCSV(session: str, category: int = 1):
 	#gsheetid = spreadsheet.get("spreadsheetId")
 	#result = (service.spreadsheets().values().update(spreadsheetId=gsheetid, range=rangeName, valueInputOption="USER_ENTERED", body=body))
 
-	sheetid = spreadsheet.id
+	gsheetid = spreadsheet.id
 	worksheet = spreadsheet.get_worksheet(0)
 	worksheet.update(rangeName, body)
 
