@@ -318,6 +318,27 @@
 					let langsDiv;
 					let langsEle;
 					let subDocEle;
+
+					docEle = document.createElement("div");
+					docEle.setAttribute("id", `csv_divider`);
+					docEle.setAttribute("class", `divider_outer`);
+					preParentEle.append(docEle);
+
+					subDocEle = document.createElement("div");
+					subDocEle.setAttribute("id", `page_csv`);
+					subDocEle.setAttribute("class", `csv`);
+					subDocEle.setAttribute("onclick", `downloadCSV()`);
+					docEle.append(subDocEle);
+					subDocEle.innerHTML = "Download CSV";
+
+					subDocEle = document.createElement("div");
+					subDocEle.setAttribute("id", `collection_csv`);
+					subDocEle.setAttribute("class", `csv`);
+					subDocEle.setAttribute("onclick", `uploadCSV()`);
+					docEle.append(subDocEle);
+					subDocEle.innerHTML = "Upload CSV";
+
+
 					docEle = document.createElement("div");
 					docEle.setAttribute("id", `page_divider`);
 					docEle.setAttribute("class", `divider_outer`);
@@ -330,12 +351,6 @@
 					docEle.append(subDocEle);
 					subDocEle.innerHTML = "Pages";
 
-					subDocEle = document.createElement("div");
-					subDocEle.setAttribute("id", `page_csv`);
-					subDocEle.setAttribute("class", `csv`);
-					subDocEle.setAttribute("onclick", `pageCSV()`);
-					docEle.append(subDocEle);
-					subDocEle.innerHTML = "Get CSV";
 
 					parentEle = document.createElement("div");
 					parentEle.setAttribute("id", `page_content`);
@@ -374,12 +389,6 @@
 					docEle.append(subDocEle);
 					subDocEle.innerHTML = "Collections";
 
-					subDocEle = document.createElement("div");
-					subDocEle.setAttribute("id", `collection_csv`);
-					subDocEle.setAttribute("class", `csv`);
-					subDocEle.setAttribute("onclick", `collectionCSV()`);
-					docEle.append(subDocEle);
-					subDocEle.innerHTML = "Get CSV";
 
 					parentEle = document.createElement("div");
 					parentEle.setAttribute("id", `collection_content`);
@@ -550,7 +559,7 @@
 			});
 		}
 
-		function pageCSV() {
+		function downloadCSV() {
 			fetch(`/pagecsv?session=${sessionId}`, {
 				method: "GET", 
 				cache: "no-cache", 

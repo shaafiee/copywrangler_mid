@@ -359,6 +359,9 @@ def pageCSV(session: str, category: int = 1):
 	worksheet.update(rangeName, body)
 
 
+	delWorksheet = spreadsheet.get_worksheet(0)
+	spreadsheet.del_worksheet(delWorksheet)
+
 	return {"status": 1, "gsheet": gsheetid}
 
 
