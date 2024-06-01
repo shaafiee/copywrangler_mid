@@ -355,7 +355,7 @@ def pageCSV(session: str, category: int = 1):
 	endColumn = chr(65 + columns)
 	rangeName = f"A1:{endColumn}{lines}"
 
-	worksheet = spreadsheet.add_worksheet("Columns", rows=lines, cols=columns)
+	worksheet = spreadsheet.add_worksheet("Collections", rows=lines, cols=columns)
 	worksheet.update(rangeName, body)
 
 
