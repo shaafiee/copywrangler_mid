@@ -313,13 +313,8 @@ def pageCSV(session: str, category: int = 1):
 		OFILE.write(service_account_info)
 	OFILE.close()
 
-	if category == 1:
-		cur.execute("select page.id, translatable.id, page.handle, tr_key, tr_value, lang from page right join translatable on resource_id = page.id order by resource_id, tr_key, lang")
-	elif category == 2:
-		cur.execute("select collection.id, translatable.id, collection.handle, tr_key, tr_value, lang from collection right join translatable on resource_id = collection.id order by resource_id, tr_key, lang")
-	rows = cur.fetchall()
 
-	title = "Pages in Shopify"
+	title = "Content in Shopify"
 
 	#scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
 	#creds = service_account.Credentials.from_service_account_file("gsheetapi.json", scopes=scopes)
@@ -331,9 +326,13 @@ def pageCSV(session: str, category: int = 1):
 	creds = service_account.Credentials.from_service_account_file("gsheetapi.json", scopes=scopes)
 	client = gspread.authorize(creds)
 	spreadsheet = client.create(title)
+	gsheetid = spreadsheet.id
 
 	spreadsheet.share(None, perm_type='anyone', role='writer')
 
+
+	cur.execute("select page.id, translatable.id, page.handle, tr_key, tr_value, lang from translatable join page on resource_id = page.id order by resource_id, tr_key, lang")
+	rows = cur.fetchall()
 	body = compileCSV(rows)
 
 	lines = len(body)
@@ -341,12 +340,22 @@ def pageCSV(session: str, category: int = 1):
 	endColumn = chr(65 + columns)
 	rangeName = f"A1:{endColumn}{lines}"
 
-	#gsheetid = spreadsheet.get("spreadsheetId")
-	#result = (service.spreadsheets().values().update(spreadsheetId=gsheetid, range=rangeName, valueInputOption="USER_ENTERED", body=body))
-
-	gsheetid = spreadsheet.id
-	worksheet = spreadsheet.get_worksheet(0)
+	worksheet = spreadsheet.add_worksheet("Pages", rows=lines, cols=columns)
 	worksheet.update(rangeName, body)
+
+
+	cur.execute("select collection.id, translatable.id, collection.handle, tr_key, tr_value, lang from translatable join page on resource_id = collection.id order by resource_id, tr_key, lang")
+	rows = cur.fetchall()
+	body = compileCSV(rows)
+
+	lines = len(body)
+	columns = len(body[0])
+	endColumn = chr(65 + columns)
+	rangeName = f"A1:{endColumn}{lines}"
+
+	worksheet = spreadsheet.add_worksheet("Columns", rows=lines, cols=columns)
+	worksheet.update(rangeName, body)
+
 
 	return {"status": 1, "gsheet": gsheetid}
 
