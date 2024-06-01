@@ -28,13 +28,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 import traceback
 #from openai import OpenAI
+
 from google.auth.transport.requests import Request
 from google.oauth2 import service_account
 #from google.auth import jwt
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-
+import gspread
 
 app = FastAPI()
 
@@ -317,13 +318,17 @@ def pageCSV(session: str):
 
 	title = "Pages in Shopify"
 
-	#gsheetId = getSecret("gsheetId")
-	scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+	#scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+	#creds = service_account.Credentials.from_service_account_file("gsheetapi.json", scopes=scopes)
+	#service = build("sheets", "v4", credentials=creds)
+	#spreadsheet = {"properties": {"title": title}}
+	#spreadsheet = (service.spreadsheets().create(body=spreadsheet, fields="spreadsheetId").execute())
+
 	creds = service_account.Credentials.from_service_account_file("gsheetapi.json", scopes=scopes)
-	service = build("sheets", "v4", credentials=creds)
-	spreadsheet = {"properties": {"title": title}}
-	spreadsheet = (service.spreadsheets().create(body=spreadsheet, fields="spreadsheetId").execute())
-	spreadsheet.share('', role='reader', type='anyone')
+	client = gspread.authorize(creds)
+	spreadsheet = client.create(title)
+
+	spreadsheet.share('', role='writer', type='anyone')
 
 	body = compileCSV(rows)
 
@@ -332,8 +337,12 @@ def pageCSV(session: str):
 	endColumn = chr(41 + columns)
 	rangeName = f"A1:{endColumn}{lines}"
 
-	gsheetid = spreadsheet.get("spreadsheetId")
+	#gsheetid = spreadsheet.get("spreadsheetId")
 	result = (service.spreadsheets().values().update(spreadsheetId=gsheetid, range=rangeName, valueInputOption="USER_ENTERED", body=body))
+
+	sheetid = spreadsheet.id
+	worksheet = spreadsheet.get_worksheet(0)
+	spreadsheet.update(rangeName, body)
 
 	return {"status": 1, "gsheet": gsheetid}
 
