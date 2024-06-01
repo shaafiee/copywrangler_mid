@@ -263,7 +263,7 @@ def pulltrans(scope: PullTransScope):
 
 
 def compileCSV(rows, isColl = False):
-	collTitle = {"title": 5, "description": 6, "body_html": 7}
+	collTitle = {"title": 5, "description": 6, "body_html": 7, "descriptionHtml": 7}
 	csv = ""
 	csvLangs = []
 	currentValues = []
@@ -283,7 +283,7 @@ def compileCSV(rows, isColl = False):
 			currentKey = row[2]
 			theHandle = row[1] if row[1] is not None else ""
 			theKey = row[2] if row[2] is not None else ""
-			if isColl:
+			if isColl and theKey in collTitle.keys():
 				theValue = row[collTitle[theKey]] if row[collTitle[theKey]] is not None else ""
 				current = [str(row[0]), '"' + theHandle + '"', '"' + theKey + '"', '"' + theValue + '"']
 				theValue = row[3] if row[3] is not None else ""
