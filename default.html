@@ -75,6 +75,7 @@
 
 		.divider {
 			display: inline-block;
+			width: 100%;
 			padding: .2em;
 			border-radius: .2em;
 			cursor: pointer;
@@ -82,11 +83,14 @@
 
 		.csv {
 			margin-left: .4em;
-			float: right;
 			display: inline-block;
 			padding: .2em;
 			border-radius: .2em;
 			cursor: pointer;
+		}
+
+		#upload_csv {
+			float: right;
 		}
 
 		.divider:hover {
@@ -325,14 +329,14 @@
 					preParentEle.append(docEle);
 
 					subDocEle = document.createElement("div");
-					subDocEle.setAttribute("id", `page_csv`);
+					subDocEle.setAttribute("id", `download_csv`);
 					subDocEle.setAttribute("class", `csv`);
 					subDocEle.setAttribute("onclick", `downloadCSV()`);
 					docEle.append(subDocEle);
 					subDocEle.innerHTML = "Download CSV";
 
 					subDocEle = document.createElement("div");
-					subDocEle.setAttribute("id", `collection_csv`);
+					subDocEle.setAttribute("id", `upload_csv`);
 					subDocEle.setAttribute("class", `csv`);
 					subDocEle.setAttribute("onclick", `uploadCSV()`);
 					docEle.append(subDocEle);
