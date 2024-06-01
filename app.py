@@ -284,16 +284,18 @@ def compileCSV(rows, isColl = False):
 				#csv = f"{csv}{preJoin}\n"
 				for theLang in theLangs:
 					if theLang in keyLang.keys():
-						if isColl and theLang != 'en':
-							current.append(keyLang[theLang])
-						else:
-							if not isColl or (isColl and theLang == 'en' and theLang in keyLang.keys()):
-								current.append(keyLang[theLang])
+						#if isColl and theLang != 'en':
+						#	current.append(keyLang[theLang])
+						#else:
+						#	if not isColl or (isColl and theLang == 'en' and theLang in keyLang.keys()):
+						#		current.append(keyLang[theLang])
+						current.append(keyLang[theLang])
 					else:
-						if isColl and theLang != 'en':
-							current.append("")
-						elif not isColl:
-							current.append("")
+						#if isColl and theLang != 'en':
+						#	current.append("")
+						#elif not isColl:
+						#	current.append("")
+						current.append("")
 				current = []
 				keyLang = {}
 			currentKey = row[2]
@@ -301,7 +303,9 @@ def compileCSV(rows, isColl = False):
 			theKey = row[2] if row[2] is not None else ""
 			if isColl and theKey in collTitle.keys():
 				theValue = row[collTitle[theKey]] if row[collTitle[theKey]] is not None else ""
-				current = [row[0], theHandle, theKey, theValue]
+				currentLang = 'en'
+				current = [row[0], theHandle, theKey]
+				keyLang[currentLang] = theValue
 				theValue = row[3] if row[3] is not None else ""
 				#current.append('"' + theValue + '"')
 				currentLang = row[4]
