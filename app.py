@@ -264,7 +264,7 @@ def pulltrans(scope: PullTransScope):
 
 def compileCSV(rows, isColl = False):
 	collTitle = {"title": 5, "description": 6, "body_html": 7, "descriptionHtml": 7}
-	theLangs = ["de", "fr", "es", "ja"]
+	theLangs = ["en", "de", "fr", "es", "ja"]
 	csv = ""
 	csvLangs = []
 	currentValues = []
@@ -283,24 +283,25 @@ def compileCSV(rows, isColl = False):
 				body.append(current)
 				#csv = f"{csv}{preJoin}\n"
 				for theLang in theLangs:
-					if theLang in keyLang.keys():
-						current.append('"' + keyLang[theLang] + '"')
-					else:
-						current.append('""')
+					if isColl and theLang != 'en':
+						if theLang in keyLang.keys():
+							current.append(keyLang[theLang])
+						else:
+							current.append("")
 				current = []
 			currentKey = row[2]
 			theHandle = row[1] if row[1] is not None else ""
 			theKey = row[2] if row[2] is not None else ""
 			if isColl and theKey in collTitle.keys():
 				theValue = row[collTitle[theKey]] if row[collTitle[theKey]] is not None else ""
-				current = [row[0], '"' + theHandle + '"', '"' + theKey + '"', '"' + theValue + '"']
+				current = [row[0], theHandle, theKey, theValue]
 				theValue = row[3] if row[3] is not None else ""
 				#current.append('"' + theValue + '"')
 				currentLang = row[4]
 				keyLang[currentLang] = theValue
 			else:
 				theValue = row[3] if row[3] is not None else ""
-				current = [row[0], '"' + theHandle + '"', '"' + theKey + '"', '"' + theValue + '"']
+				current = [row[0], theHandle, theKey]
 		else:
 			currentLang = row[4]
 			theValue = row[3] if row[3] is not None else ""
