@@ -315,6 +315,8 @@ def compileCSV(rows, isColl = False):
 			currentLang = row[4]
 			theValue = row[3] if row[3] is not None else ""
 			keyLang[currentLang] = theValue
+			if currentLang not in theLangs:
+				theLangs.append(currentLang)
 			#theValue = row[3] if row[3] is not None else ""
 			#current.append('"' + theValue + '"')
 		#if row[4] not in csvLangs:
