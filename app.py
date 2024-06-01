@@ -294,7 +294,7 @@ def compileCSV(rows):
 
 
 @app.get('/pagecsv')
-def pageCSV(session: str):
+def pageCSV(session: str, category: int = 1):
 	if session is not None or len(session) < 1:
 		session = re.sub(r"('|;)", "", session)
 	else:
@@ -313,7 +313,10 @@ def pageCSV(session: str):
 		OFILE.write(service_account_info)
 	OFILE.close()
 
-	cur.execute("select page.id, translatable.id, page.handle, tr_key, tr_value, lang from page right join translatable on resource_id = page.id order by resource_id, tr_key, lang")
+	if category == 1:
+		cur.execute("select page.id, translatable.id, page.handle, tr_key, tr_value, lang from page right join translatable on resource_id = page.id order by resource_id, tr_key, lang")
+	elif category == 2:
+		cur.execute("select collection.id, translatable.id, collection.handle, tr_key, tr_value, lang from collection right join translatable on resource_id = collection.id order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
 
 	title = "Pages in Shopify"
@@ -339,7 +342,7 @@ def pageCSV(session: str):
 	rangeName = f"A1:{endColumn}{lines}"
 
 	#gsheetid = spreadsheet.get("spreadsheetId")
-	result = (service.spreadsheets().values().update(spreadsheetId=gsheetid, range=rangeName, valueInputOption="USER_ENTERED", body=body))
+	#result = (service.spreadsheets().values().update(spreadsheetId=gsheetid, range=rangeName, valueInputOption="USER_ENTERED", body=body))
 
 	sheetid = spreadsheet.id
 	worksheet = spreadsheet.get_worksheet(0)
