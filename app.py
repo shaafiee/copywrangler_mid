@@ -272,9 +272,8 @@ def compileCSV(rows):
 	body = []
 	for row in rows:
 		if row[2] != currentKey:
-			if currentKey is None:
+			if currentKey is not None:
 				langsComposed = True
-			else:
 				#preJoin = ','.join(current)
 				body.append(current)
 				#csv = f"{csv}{preJoin}\n"
@@ -285,7 +284,8 @@ def compileCSV(rows):
 			theValue = row[3] if row[3] is not None else ""
 			current = [str(row[0]), '"' + theHandle + '"', '"' + theKey + '"', '"' + theValue + '"']
 		else:
-			current.append('"' + row[4] + '"')
+			theValue = row[3] if row[3] is not None else ""
+			current.append('"' + theValue + '"')
 		if not langsComposed:
 			csvLangs.append(row[-1])
 	header = ["", "", ""] + csvLangs
