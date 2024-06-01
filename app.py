@@ -271,7 +271,7 @@ def compileCSV(rows):
 	langsComposed = False
 	body = []
 	for row in rows:
-		if row[0] != currentKey:
+		if row[2] != currentKey:
 			if currentKey is None:
 				langsComposed = True
 			else:
@@ -279,15 +279,17 @@ def compileCSV(rows):
 				body.append(current)
 				#csv = f"{csv}{preJoin}\n"
 				current = []
-			currentKey = row[3]
-			theHandle = row[2] if row[2] is not None else ""
-			theKey = row[3] if row[3] is not None else ""
-			theValue = row[4] if row[4] is not None else ""
-			current = [str(row[0]), str(row[1]), '"' + theHandle + '"', '"' + theKey + '"', '"' + theValue + '"']
+			currentKey = row[2]
+			theHandle = row[1] if row[1] is not None else ""
+			theKey = row[2] if row[2] is not None else ""
+			theValue = row[3] if row[3] is not None else ""
+			current = [str(row[0]), '"' + theHandle + '"', '"' + theKey + '"', '"' + theValue + '"']
 		else:
 			current.append('"' + row[4] + '"')
-		csvLangs.append(row[-1])
-	#header = ["", "", "", ""] + csvLangs
+		if not langsComposed:
+			csvLangs.append(row[-1])
+	header = ["", "", ""] + csvLangs
+	body.insert(0, header)
 	#preJoin = ','.join(header)
 	#csv = f"{preJoin}\n{csv}"
 	return body
@@ -331,7 +333,7 @@ def pageCSV(session: str, category: int = 1):
 	spreadsheet.share(None, perm_type='anyone', role='writer')
 
 
-	cur.execute("select page.id, translatable.id, page.handle, tr_key, tr_value, lang from translatable join page on resource_id = page.id order by resource_id, tr_key, lang")
+	cur.execute("select page.id, page.handle, tr_key, tr_value, lang from translatable join page on resource_id = page.id order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
 	body = compileCSV(rows)
 
@@ -344,7 +346,7 @@ def pageCSV(session: str, category: int = 1):
 	worksheet.update(rangeName, body)
 
 
-	cur.execute("select collection.id, translatable.id, collection.handle, tr_key, tr_value, lang from translatable join page on resource_id = collection.id order by resource_id, tr_key, lang")
+	cur.execute("select collection.id, collection.handle, tr_key, tr_value, lang from translatable join page on resource_id = collection.id order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
 	body = compileCSV(rows)
 
