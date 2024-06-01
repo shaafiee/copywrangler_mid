@@ -283,11 +283,13 @@ def compileCSV(rows, isColl = False):
 				body.append(current)
 				#csv = f"{csv}{preJoin}\n"
 				for theLang in theLangs:
-					if isColl and theLang != 'en':
-						if theLang in keyLang.keys():
+					if theLang in keyLang.keys():
+						if theColl and theLang != 'en':
 							current.append(keyLang[theLang])
-						else:
-							current.append("")
+						elif not theColl:
+							current.append(keyLang[theLang])
+					else:
+						current.append("")
 				current = []
 			currentKey = row[2]
 			theHandle = row[1] if row[1] is not None else ""
@@ -310,7 +312,7 @@ def compileCSV(rows, isColl = False):
 			#current.append('"' + theValue + '"')
 		#if row[4] not in csvLangs:
 		#	csvLangs.append(row[4])
-	header = ["", "", "", "en"] + theLangs
+	header = ["", "", ""] + theLangs
 	body.insert(0, header)
 	#preJoin = ','.join(header)
 	#csv = f"{preJoin}\n{csv}"
