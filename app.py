@@ -346,7 +346,7 @@ def pageCSV(session: str, category: int = 1):
 
 	sheetid = spreadsheet.id
 	worksheet = spreadsheet.get_worksheet(0)
-	spreadsheet.update(rangeName, body)
+	worksheet.update(rangeName, body)
 
 	return {"status": 1, "gsheet": gsheetid}
 
