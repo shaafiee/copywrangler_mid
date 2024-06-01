@@ -291,6 +291,7 @@ def compileCSV(rows, isColl = False):
 					else:
 						current.append("")
 				current = []
+				keyLang = {}
 			currentKey = row[2]
 			theHandle = row[1] if row[1] is not None else ""
 			theKey = row[2] if row[2] is not None else ""
@@ -304,6 +305,8 @@ def compileCSV(rows, isColl = False):
 			else:
 				theValue = row[3] if row[3] is not None else ""
 				current = [row[0], theHandle, theKey]
+				currentLang = row[4]
+				keyLang[currentLang] = theValue
 		else:
 			currentLang = row[4]
 			theValue = row[3] if row[3] is not None else ""
