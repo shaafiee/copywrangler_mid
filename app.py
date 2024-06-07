@@ -36,6 +36,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import gspread
+from hashlib import sha256
+
 
 app = FastAPI()
 
@@ -420,6 +422,68 @@ def updateTrans(scope: UpdateTrans):
 
 	cur.execute("update translatable set tr_value = %s where resource_id = %s and tr_key = %s and lang = %s", (scope.trValue, scope.resource, scope.trKey, scope.lang))
 	conn.commit()
+	return {"status": 1, "content": "saved"}
+
+
+def hasher(value):
+	if value is None:
+		return ""
+	return sha256(value.encode("utf-8")).hexdigest()
+
+
+def updateItem(conn, cur, table, handle, key, value, lang):
+	cur.execute(f"select id from {table} where handle like %s", (handle, ))
+	if cur.rowcount < 1:
+		return None
+	resouceId = cur.fetchone()[0]
+	if lang == 'en':
+		digest = hasher(value)
+		cur.execute("update translatable set tr_value = %s, digest = %s where tr_key = %s and resource_id = %s and lang = %s", (value, digest, key, resourceId, lang))
+	else:
+		cur.execute("update translatable set tr_value = %s where tr_key = %s and resource_id = %s and lang = %s", (value, key, resourceId, lang))
+	conn.commit()
+	return True
+
+
+@app.post('/upload')
+def uploadSheet(scope: UploadSheet):
+	session = scope.session
+	if session is not None or len(session) < 1:
+		session = re.sub(r"('|;)", "", session)
+	else:
+		return {"status": 0, "error": "session key not found"}
+
+	cw_conn, cw_cur = cwDbConnect()
+
+	userId, firstName = cwCheckSession(cw_conn, cw_cur, session)
+	if not userId:
+		return {"status": 0, "error": "could not verify session"}
+
+	conn, cur = dbConnect()
+
+	service_account_info = getSecret("gsheetapi")
+	with open("gsheetapi.json", "w") as OFILE:
+		OFILE.write(service_account_info)
+	OFILE.close()
+
+	scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+	creds = service_account.Credentials.from_service_account_file("gsheetapi.json", scopes=scopes)
+	client = gspread.authorize(creds)
+	spreadsheet = client.open_by_url(scope.url)
+	gsheetid = spreadsheet.id
+
+	#spreadsheet.share(None, perm_type='anyone', role='writer')
+	pageSheet = spreadsheet.get_worksheet(0)
+	collSheet = spreadsheet.get_worksheet(1)
+	pages = pageSheet.get_all_values()
+	colls = collSheet.get_all_values()
+
+	langs = ["en", "de", "fr", "es", "ja"]
+	for idx, page in enumerate(pages):
+		if idx > 0:
+			for jdx in range(5):
+				updateItem(conn, cur, "page", pages[idx][1], pages[idx][2], pages[idx][3 + jdx], langs[jdx])
+
 	return {"status": 1, "content": "saved"}
 
 
