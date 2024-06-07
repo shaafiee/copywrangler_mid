@@ -29,3 +29,7 @@ class UpdateTrans(BaseModel):
 	trKey: str
 	trValue: str
 	lang: str
+
+class UploadSheet(BaseModel):
+	session: str
+	url: str
