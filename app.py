@@ -408,7 +408,7 @@ def updateItem(conn, cur, table, handle, key, value, lang):
 	cur.execute(f"select id from {table} where handle like %s", (handle, ))
 	if cur.rowcount < 1:
 		return None
-	resouceId = cur.fetchone()[0]
+	resourceId = cur.fetchone()[0]
 	if lang == 'en':
 		digest = hasher(value)
 		cur.execute("update translatable set tr_value = %s, digest = %s where tr_key = %s and resource_id = %s and lang = %s", (value, digest, key, resourceId, lang))
