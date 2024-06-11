@@ -404,6 +404,26 @@ def pageCSV(session: str, category: int = 1):
 	return {"status": 1, "gsheet": gsheetid}
 
 
+def updateItem(conn, cur, table, handle, key, value, lang):
+	cur.execute(f"select id from {table} where handle like %s", (handle, ))
+	if cur.rowcount < 1:
+		return None
+	resouceId = cur.fetchone()[0]
+	if lang == 'en':
+		digest = hasher(value)
+		cur.execute("update translatable set tr_value = %s, digest = %s where tr_key = %s and resource_id = %s and lang = %s", (value, digest, key, resourceId, lang))
+	else:
+		cur.execute("update translatable set tr_value = %s where tr_key = %s and resource_id = %s and lang = %s", (value, key, resourceId, lang))
+	conn.commit()
+	return True
+
+
+def hasher(value):
+	if value is None:
+		return ""
+	return sha256(value.encode("utf-8")).hexdigest()
+
+
 @app.post('/updatetrans')
 def updateTrans(scope: UpdateTrans):
 	session = scope.session
@@ -420,29 +440,14 @@ def updateTrans(scope: UpdateTrans):
 
 	conn, cur = dbConnect()
 
-	cur.execute("update translatable set tr_value = %s where resource_id = %s and tr_key = %s and lang = %s", (scope.trValue, scope.resource, scope.trKey, scope.lang))
-	conn.commit()
-	return {"status": 1, "content": "saved"}
-
-
-def hasher(value):
-	if value is None:
-		return ""
-	return sha256(value.encode("utf-8")).hexdigest()
-
-
-def updateItem(conn, cur, table, handle, key, value, lang):
-	cur.execute(f"select id from {table} where handle like %s", (handle, ))
-	if cur.rowcount < 1:
-		return None
-	resouceId = cur.fetchone()[0]
 	if lang == 'en':
 		digest = hasher(value)
-		cur.execute("update translatable set tr_value = %s, digest = %s where tr_key = %s and resource_id = %s and lang = %s", (value, digest, key, resourceId, lang))
+		cur.execute("update translatable set tr_value = %s, digest = %s where resource_id = %s and tr_key = %s and lang = %s", (scope.trValue, digest, scope.resource, scope.trKey, scope.lang))
 	else:
-		cur.execute("update translatable set tr_value = %s where tr_key = %s and resource_id = %s and lang = %s", (value, key, resourceId, lang))
+		cur.execute("update translatable set tr_value = %s where resource_id = %s and tr_key = %s and lang = %s", (scope.trValue, scope.resource, scope.trKey, scope.lang))
 	conn.commit()
-	return True
+	
+	return {"status": 1, "content": "saved"}
 
 
 @app.post('/upload')

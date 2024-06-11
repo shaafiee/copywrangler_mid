@@ -204,13 +204,16 @@
 		    document.getElementById("notifications").style.visibility = "hidden";
 		}
 		
-		function showNotification(note, waitTime) {
+		function showNotification(note, waitTime, perpetual = false) {
 		    document.getElementById("notifications").innerHTML = note;
 		    document.getElementById("notifications").style.visibility = "visible";
-		    if (waitTime > 0) {
-		        //setTimeout(hideNotification, waitTime);
-		    } else {
-		        setTimeout(hideNotification, 1500);
+                    if (perpetual) {
+                    } else {
+		        if (waitTime > 0) {
+		            setTimeout(hideNotification, waitTime);
+		        } else {
+		            setTimeout(hideNotification, 1500);
+		        }
 		    }
 		}
 		
@@ -574,16 +577,34 @@
 				}
 			});
 
-			/*.then((data) => data.json())
+		}
+
+		function uploadCSV() {
+			let theUrl = prompt("Link to Google sheet:");
+			showNotification("Downloading...", 0, true);
+			if (theUrl.length < 20) {
+				showNotification("URL seems incorrect");
+				return;
+			}
+			let data = {
+				"session": sessionId,
+				"url": theUrl,
+				"scope": ""
+			}
+			showNotification("Uploading...", 0, true);
+			fetch(`/upload`, {
+				method: "POST", 
+				cache: "no-cache", 
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify(data)
+			})
+			.then((data) => data.json())
 			.then((content) => {
-				console.log(content);
 				if (content['status'] == 1) {
-					showNotification("Pulling...");
-				} else {
-					showNotification("Pull request failed");
+					showNotification("Done");
 				}
-				window.setTimeout(pullCheck, 5000);
-			});*/
+			});
+
 		}
 
 		window.addEventListener("load", function(e) {
