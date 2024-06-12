@@ -409,11 +409,14 @@ def updateItem(conn, cur, table, handle, key, value, lang):
 	if cur.rowcount < 1:
 		return None
 	resourceId = cur.fetchone()[0]
+	cur.execute("select altered from translatable where resource_id = %s and tr_key = %s and tr_value = %s", (resourceId, key, value))
+	if cur.rowcount > 0:
+		return False
 	if lang == 'en':
 		digest = hasher(value)
-		cur.execute("update translatable set tr_value = %s, digest = %s where tr_key = %s and resource_id = %s and lang = %s", (value, digest, key, resourceId, lang))
+		cur.execute("update translatable set tr_value = %s, digest = %s, altered = 1 where tr_key = %s and resource_id = %s and lang = %s", (value, digest, key, resourceId, lang))
 	else:
-		cur.execute("update translatable set tr_value = %s where tr_key = %s and resource_id = %s and lang = %s", (value, key, resourceId, lang))
+		cur.execute("update translatable set tr_value = %s, altered = 1 where tr_key = %s and resource_id = %s and lang = %s", (value, key, resourceId, lang))
 	conn.commit()
 	return True
 
@@ -442,9 +445,9 @@ def updateTrans(scope: UpdateTrans):
 
 	if lang == 'en':
 		digest = hasher(value)
-		cur.execute("update translatable set tr_value = %s, digest = %s where resource_id = %s and tr_key = %s and lang = %s", (scope.trValue, digest, scope.resource, scope.trKey, scope.lang))
+		cur.execute("update translatable set tr_value = %s, digest = %s, altered = 1 where resource_id = %s and tr_key = %s and lang = %s", (scope.trValue, digest, scope.resource, scope.trKey, scope.lang))
 	else:
-		cur.execute("update translatable set tr_value = %s where resource_id = %s and tr_key = %s and lang = %s", (scope.trValue, scope.resource, scope.trKey, scope.lang))
+		cur.execute("update translatable set tr_value = %s, altered = 1 where resource_id = %s and tr_key = %s and lang = %s", (scope.trValue, scope.resource, scope.trKey, scope.lang))
 	conn.commit()
 	
 	return {"status": 1, "content": "saved"}
