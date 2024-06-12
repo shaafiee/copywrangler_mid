@@ -443,7 +443,7 @@ def updateTrans(scope: UpdateTrans):
 
 	conn, cur = dbConnect()
 
-	if lang == 'en':
+	if scope.lang == 'en':
 		digest = hasher(value)
 		cur.execute("update translatable set tr_value = %s, digest = %s, altered = 1 where resource_id = %s and tr_key = %s and lang = %s", (scope.trValue, digest, scope.resource, scope.trKey, scope.lang))
 	else:

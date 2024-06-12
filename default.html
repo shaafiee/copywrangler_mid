@@ -265,6 +265,7 @@
 				} else {
 					document.getElementById("pullButton").classList.remove('buttonBusy');
 					pullContent();
+					showNotification("Pull complete");
 				}
 			});
 		}
@@ -289,9 +290,9 @@
 			.then((content) => {
 				console.log(content);
 				if (content['status'] == 1) {
-					showNotification("Pulling...");
+					showNotification("Pulling...", 0, true);
 				} else {
-					showNotification("Pull request failed");
+					showNotification("Pull request failed", 0, true);
 				}
 				window.setTimeout(pullCheck, 5000);
 			});
