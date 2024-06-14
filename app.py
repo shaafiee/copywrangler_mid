@@ -306,7 +306,11 @@ def compileCSV(rows, isColl = False):
 			if isColl and theKey in collTitle.keys():
 				theValue = row[collTitle[theKey]] if row[collTitle[theKey]] is not None else ""
 				currentLang = 'en'
-				current = [row[0], theHandle, theKey]
+				current = []
+				if isColl:
+					current = [f"/collections/{theHandle}", theHandle, theKey]
+				else:
+					current = [f"/pages/{theHandle}", theHandle, theKey]
 				keyLang[currentLang] = theValue
 				theValue = row[3] if row[3] is not None else ""
 				#current.append('"' + theValue + '"')

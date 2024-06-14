@@ -538,6 +538,7 @@
 				"scope": ""
 			}
 
+			showNotification("Loading translatable items...", 0, true);
 			fetch("/pulltrans", {
 				method: "POST", 
 				cache: "no-cache", 
@@ -546,7 +547,7 @@
 			})
 			.then((data) => data.json())
 			.then((preContent) => {
-				console.log(preContent);
+				hideNotification();
 				if (preContent['status'] == 1 && resourceId > 0) {
 					let translations = document.getElementById('translations');
 					if (translations == undefined) {
