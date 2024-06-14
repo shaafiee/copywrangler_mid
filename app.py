@@ -412,11 +412,11 @@ def pageCSV(session: str, category: int = 1):
 
 
 def updateItem(conn, cur, table, handle, key, value, lang):
-	cur.execute(f"select id from {table} where handle like %s", (handle, ))
+	cur.execute(f"select id from {table} where handle = %s", (handle, ))
 	if cur.rowcount < 1:
 		return None
 	resourceId = cur.fetchone()[0]
-	cur.execute("select altered from translatable where resource_id = %s and tr_key = %s and tr_value = %s", (resourceId, key, value))
+	cur.execute("select altered from translatable where resource_id = %s and tr_key = %s and tr_value = %s and lang = %s", (resourceId, key, value, lang))
 	if cur.rowcount > 0:
 		return False
 	if lang == 'en':
@@ -494,10 +494,16 @@ def uploadSheet(scope: UploadSheet):
 	colls = collSheet.get_all_values()
 
 	langs = ["en", "de", "fr", "es", "ja"]
-	for idx, page in enumerate(pages):
-		if idx > 0:
-			for jdx in range(5):
-				updateItem(conn, cur, "page", pages[idx][1], pages[idx][2], pages[idx][3 + jdx], langs[jdx])
+	for jdx, lang in enumerate(langs):
+		for idx, page in enumerate(pages):
+			if idx > 0:
+				for jdx in range(5):
+					updateItem(conn, cur, "page", pages[idx][1], pages[idx][2], pages[idx][3 + jdx], lang)
+
+		for idx, coll in enumerate(colls):
+			if idx > 0:
+				for jdx in range(5):
+					updateItem(conn, cur, "collection", colls[idx][1], colls[idx][2], colls[idx][3 + jdx], lang)
 
 	return {"status": 1, "content": "saved"}
 
