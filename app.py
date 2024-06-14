@@ -495,6 +495,60 @@ def uploadSheet(scope: UploadSheet):
 	return {"status": 1, "content": "saved"}
 
 
+@app.post('/push')
+def push(session: str):
+	if session is not None or len(session) < 1:
+		session = re.sub(r"('|;)", "", session)
+	else:
+		return {"status": 0, "error": "session key not found"}
+
+	#for refCode in scope.products:
+	#	if not re.match(r"^[a-zA-Z0-9_\-\/\s]*$", refCode):
+	#		return {"status": 0, "error": f"incorrect ref code {refCode}"}
+
+	cw_conn, cw_cur = cwDbConnect()
+
+	userId, firstName = cwCheckSession(cw_conn, cw_cur, session)
+	if not userId:
+		return {"status": 0, "error": "could not verify session"}
+
+	conn, cur = dbConnect()
+
+	cur.execute("select id, pages, collections, scope from queue where push = 1 and (done is NULL or done <> 1) and (term is NULL or term <> 1)")
+	if cur.rowcount > 0:
+		return {"status": 0, "error": "A push request is still being processed"}
+
+	cur.execute("insert into queue (push) values (1)")
+	conn.commit()
+	return {"status": 1, "content": "Push request queued"}
+
+
+@app.get('/pushcheck')
+def pushCheck(session):
+	if session is not None or len(session) < 1:
+		session = re.sub(r"('|;)", "", session)
+	else:
+		return {"status": 0, "error": "session key not found"}
+
+	#for refCode in scope.products:
+	#	if not re.match(r"^[a-zA-Z0-9_\-\/\s]*$", refCode):
+	#		return {"status": 0, "error": f"incorrect ref code {refCode}"}
+
+	cw_conn, cw_cur = cwDbConnect()
+
+	userId, firstName = cwCheckSession(cw_conn, cw_cur, session)
+	if not userId:
+		return {"status": 0, "error": "could not verify session"}
+
+	conn, cur = dbConnect()
+
+	cur.execute("select id, pages, collections, scope from queue where push = 1 and (done is NULL or done <> 1) and (term is NULL or term <> 1)")
+	if cur.rowcount > 0:
+		return {"status": 0, "error": "A push request is still being processed"}
+	else:
+		return {"status": 1, "content": "No push requests"}
+
+
 if __name__ == '__main__':
 	print("STARTING")
 	GCP_PROJECT_ID = requests.get("http://metadata.google.internal/computeMetadata/v1/project/project-id")

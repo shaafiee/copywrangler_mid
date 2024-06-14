@@ -298,6 +298,44 @@
 			});
 		}
 
+		function pushCheck() {
+			fetch(`/pushcheck?session=${sessionId}`, {
+				cache: "no-cache", 
+				headers: {"Content-Type": "application/json"}
+			})
+			.then((data) => data.json())
+			.then((content) => {
+				if (content['status'] == 0) {
+					window.setTimeout(pushCheck, 5000);
+					if (! document.getElementById("pushButton").classList.contains('buttonBusy')) {
+						document.getElementById("pushButton").classList.add('buttonBusy');
+					}
+				} else {
+					document.getElementById("pushButton").classList.remove('buttonBusy');
+					showNotification("Push complete");
+				}
+			});
+		}
+
+		function push() {
+			document.getElementById("pushButton").classList.add('buttonBusy');
+
+			fetch(`/push?session=${sessionId}`, {
+				cache: "no-cache", 
+				headers: {"Content-Type": "application/json"}
+			})
+			.then((data) => data.json())
+			.then((content) => {
+				console.log(content);
+				if (content['status'] == 1) {
+					showNotification("Pushing...", 0, true);
+				} else {
+					showNotification("Push request failed", 0, true);
+				}
+				window.setTimeout(pushCheck, 5000);
+			});
+		}
+
 		function pullContent() {
 			let data = {
 				"session": sessionId,
@@ -625,7 +663,7 @@
 		<div id="pageCollDiv">
 			<div id="buttonsDiv">
                        		<button type="button" id="pullButton" class="button mainButtons">Pull</button>
-                       		<!--<button type="button" id="pushButton" class="button mainButtons">Push</button>-->
+                       		<button type="button" id="pushButton" class="button mainButtons">Push</button>
 			</div>
 			<div id="dataColl">
 			</div>
