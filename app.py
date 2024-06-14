@@ -306,11 +306,7 @@ def compileCSV(rows, isColl = False):
 			if isColl and theKey in collTitle.keys():
 				theValue = row[collTitle[theKey]] if row[collTitle[theKey]] is not None else ""
 				currentLang = 'en'
-				current = []
-				if isColl:
-					current = [f"/collections/{theHandle}", theHandle, theKey]
-				else:
-					current = [f"/pages/{theHandle}", theHandle, theKey]
+				current = [f"https://comfort-works.com/collections/{theHandle}", theHandle, theKey]
 				keyLang[currentLang] = theValue
 				theValue = row[3] if row[3] is not None else ""
 				#current.append('"' + theValue + '"')
@@ -318,7 +314,8 @@ def compileCSV(rows, isColl = False):
 				keyLang[currentLang] = theValue
 			else:
 				theValue = row[3] if row[3] is not None else ""
-				current = [row[0], theHandle, theKey]
+				#current = [row[0], theHandle, theKey]
+				current = [f"https://comfort-works.com/pages/{theHandle}", theHandle, theKey]
 				currentLang = row[4]
 				keyLang[currentLang] = theValue
 		else:
@@ -448,7 +445,7 @@ def updateTrans(scope: UpdateTrans):
 	conn, cur = dbConnect()
 
 	if scope.lang == 'en':
-		digest = hasher(value)
+		digest = hasher(scope.trValue)
 		cur.execute("update translatable set tr_value = %s, digest = %s, altered = 1 where resource_id = %s and tr_key = %s and lang = %s", (scope.trValue, digest, scope.resource, scope.trKey, scope.lang))
 	else:
 		cur.execute("update translatable set tr_value = %s, altered = 1 where resource_id = %s and tr_key = %s and lang = %s", (scope.trValue, scope.resource, scope.trKey, scope.lang))
