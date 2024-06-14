@@ -381,9 +381,12 @@ def pageCSV(session: str, category: int = 1):
 	columns = len(body[0])
 	endColumn = chr(65 + columns)
 	rangeName = f"A1:{endColumn}{lines}"
+	wrapRangeName = f"D1:{endColumn}{lines}"
 
 	worksheet = spreadsheet.add_worksheet("Pages", rows=lines, cols=columns)
+
 	worksheet.update(rangeName, body)
+	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
 	cur.execute("select collection.id, collection.handle, tr_key, tr_value, lang, title, description, descriptionHtml from translatable join collection on resource_id = collection.id where tr_key not like 'handle' order by resource_id, tr_key, lang")
@@ -394,9 +397,12 @@ def pageCSV(session: str, category: int = 1):
 	columns = len(body[0])
 	endColumn = chr(65 + columns)
 	rangeName = f"A1:{endColumn}{lines}"
+	wrapRangeName = f"D1:{endColumn}{lines}"
 
 	worksheet = spreadsheet.add_worksheet("Collections", rows=lines, cols=columns)
+
 	worksheet.update(rangeName, body)
+	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
 	delWorksheet = spreadsheet.get_worksheet(0)
