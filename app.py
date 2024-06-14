@@ -412,9 +412,11 @@ def pageCSV(session: str, category: int = 1):
 
 
 def updateItem(conn, cur, table, handle, key, value, lang):
+	if value is None or value == "" or len(value) < 1:
+		return False
 	cur.execute(f"select id from {table} where handle = %s", (handle, ))
 	if cur.rowcount < 1:
-		return None
+		return False
 	resourceId = cur.fetchone()[0]
 	cur.execute("select altered from translatable where resource_id = %s and tr_key = %s and tr_value = %s and lang = %s", (resourceId, key, value, lang))
 	if cur.rowcount > 0:
