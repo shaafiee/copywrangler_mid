@@ -418,7 +418,11 @@ def updateItem(conn, cur, table, handle, key, value, lang):
 	if cur.rowcount < 1:
 		return False
 	resourceId = cur.fetchone()[0]
-	cur.execute("select altered from translatable where resource_id = %s and tr_key = %s and tr_value = %s and lang = %s", (resourceId, key, value, lang))
+	key = key.rstrip()
+	key = key.lstrip()
+	value = value.rstrip()
+	value = value.lstrip()
+	cur.execute("select altered from translatable where resource_id = %s and tr_key like %s and tr_value like %s and lang = %s", (resourceId, key, value, lang))
 	if cur.rowcount > 0:
 		return False
 	if lang == 'en':
