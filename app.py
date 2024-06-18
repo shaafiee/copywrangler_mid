@@ -405,6 +405,22 @@ def pageCSV(session: str, category: int = 1):
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
+	cur.execute("select asset.id, asset.handle, tr_key, tr_value, lang, title, description, descriptionHtml from translatable join asset on resource_id = asset.id where tr_key not like 'handle' order by resource_id, tr_key, lang")
+	rows = cur.fetchall()
+	body = compileCSV(rows, True)
+
+	lines = len(body)
+	columns = len(body[0])
+	endColumn = chr(65 + columns)
+	rangeName = f"A1:{endColumn}{lines}"
+	wrapRangeName = f"D1:{endColumn}{lines}"
+
+	worksheet = spreadsheet.add_worksheet("Assets", rows=lines, cols=columns)
+
+	worksheet.update(rangeName, body)
+	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
+
+
 	delWorksheet = spreadsheet.get_worksheet(0)
 	spreadsheet.del_worksheet(delWorksheet)
 
@@ -414,7 +430,10 @@ def pageCSV(session: str, category: int = 1):
 def updateItem(conn, cur, table, handle, key, value, lang):
 	if value is None or value == "" or len(value) < 1:
 		return False
-	cur.execute(f"select id from {table} where handle = %s", (handle, ))
+	if table == 'asset':
+		cur.execute(f"select id from {table} limit 1")
+	else:
+		cur.execute(f"select id from {table} where handle = %s", (handle, ))
 	if cur.rowcount < 1:
 		return False
 	resourceId = cur.fetchone()[0]
@@ -496,8 +515,10 @@ def uploadSheet(scope: UploadSheet):
 	#spreadsheet.share(None, perm_type='anyone', role='writer')
 	pageSheet = spreadsheet.get_worksheet(0)
 	collSheet = spreadsheet.get_worksheet(1)
+	assetSheet = spreadsheet.get_worksheet(2)
 	pages = pageSheet.get_all_values()
 	colls = collSheet.get_all_values()
+	assets = assetSheet.get_all_values()
 
 	langs = ["en", "de", "fr", "es", "ja"]
 	for jdx, lang in enumerate(langs):
@@ -510,6 +531,11 @@ def uploadSheet(scope: UploadSheet):
 			if idx > 0:
 				for jdx in range(5):
 					updateItem(conn, cur, "collection", colls[idx][1], colls[idx][2], colls[idx][3 + jdx], lang)
+
+		for idx, coll in enumerate(assets):
+			if idx > 0:
+				for jdx in range(5):
+					updateItem(conn, cur, "asset", colls[idx][1], colls[idx][2], colls[idx][3 + jdx], lang)
 
 	return {"status": 1, "content": "saved"}
 
