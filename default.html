@@ -341,6 +341,7 @@
 				"session": sessionId,
 				"pages": 1,
 				"collections": 1,
+				"assets": 1,
 				"scope": ""
 			}
 
@@ -476,14 +477,15 @@
 					parentEle = document.createElement("div");
 					parentEle.setAttribute("id", `asset_content`);
 					preParentEle.append(parentEle);
-					content.collections.forEach((pageNow) => {
+					content.assets.forEach((pageNow) => {
 						docEle = document.createElement("div");
 						docEle.setAttribute("id", `page_${pageNow[0]}`);
 						docEle.setAttribute("class", `aAsset`);
 						docEle.setAttribute("onclick", `pullTrans(${pageNow[0]}, 3)`);
-						langsIncluded = (pageNow[3] == undefined || pageNow[3] == null) ? [] : pageNow[3].split("|");
-						docEle.innerHTML = (pageNow[2] == null || pageNow[2] == undefined) ? `${pageNow[1]}` : `${pageNow[1]} / ${pageNow[2]}`;
-						langsDiv = document.createElement("div");
+						//langsIncluded = (pageNow[3] == undefined || pageNow[3] == null) ? [] : pageNow[3].split("|");
+						//docEle.innerHTML = (pageNow[2] == null || pageNow[2] == undefined) ? `${pageNow[1]}` : `${pageNow[1]} / ${pageNow[2]}`;
+						docEle.innerHTML = pageNow[0];
+						/*langsDiv = document.createElement("div");
 						langsDiv.setAttribute("class", "langsDiv");
 						docEle.prepend(langsDiv);
 						langsIncluded.forEach((langIncluded) => {
@@ -494,7 +496,7 @@
 						});
 						if (langsIncluded.length != langs.length) {
 							langsDiv.classList.add('langsIncomplete');
-						}
+						}*/
 						parentEle.append(docEle);
 					});
 				}
