@@ -341,6 +341,7 @@
 				"session": sessionId,
 				"pages": 1,
 				"collections": 1,
+				"assets": 1,
 				"scope": ""
 			}
 
@@ -404,7 +405,7 @@
 						docEle = document.createElement("div");
 						docEle.setAttribute("id", `page_${pageNow[0]}`);
 						docEle.setAttribute("class", `aPage`);
-						docEle.setAttribute("onclick", `pullTrans(${pageNow[0]})`);
+						docEle.setAttribute("onclick", `pullTrans(${pageNow[0]}, 1)`);
 						langsIncluded = (pageNow[3] == undefined || pageNow[3] == null) ? [] : pageNow[3].split("|");
 						docEle.innerHTML = (pageNow[2] == null || pageNow[2] == undefined) ? `${pageNow[1]}` : `${pageNow[1]} / ${pageNow[2]}`;
 						langsDiv = document.createElement("div");
@@ -442,7 +443,7 @@
 						docEle = document.createElement("div");
 						docEle.setAttribute("id", `page_${pageNow[0]}`);
 						docEle.setAttribute("class", `aColl`);
-						docEle.setAttribute("onclick", `pullTrans(${pageNow[0]})`);
+						docEle.setAttribute("onclick", `pullTrans(${pageNow[0]}, 2)`);
 						langsIncluded = (pageNow[3] == undefined || pageNow[3] == null) ? [] : pageNow[3].split("|");
 						docEle.innerHTML = (pageNow[2] == null || pageNow[2] == undefined) ? `${pageNow[1]}` : `${pageNow[1]} / ${pageNow[2]}`;
 						langsDiv = document.createElement("div");
@@ -457,6 +458,45 @@
 						if (langsIncluded.length != langs.length) {
 							langsDiv.classList.add('langsIncomplete');
 						}
+						parentEle.append(docEle);
+					});
+
+					docEle = document.createElement("div");
+					docEle.setAttribute("id", `asset_divider`);
+					docEle.setAttribute("class", `divider_outer`);
+					preParentEle.append(docEle);
+
+					subDocEle = document.createElement("div");
+					subDocEle.setAttribute("id", `asset_label`);
+					subDocEle.setAttribute("onclick", `toggleAssets()`);
+					subDocEle.setAttribute("class", `divider`);
+					docEle.append(subDocEle);
+					subDocEle.innerHTML = "Assets";
+
+
+					parentEle = document.createElement("div");
+					parentEle.setAttribute("id", `asset_content`);
+					preParentEle.append(parentEle);
+					content.assets.forEach((pageNow) => {
+						docEle = document.createElement("div");
+						docEle.setAttribute("id", `page_${pageNow[0]}`);
+						docEle.setAttribute("class", `aAsset`);
+						docEle.setAttribute("onclick", `pullTrans(${pageNow[0]}, 3)`);
+						//langsIncluded = (pageNow[3] == undefined || pageNow[3] == null) ? [] : pageNow[3].split("|");
+						//docEle.innerHTML = (pageNow[2] == null || pageNow[2] == undefined) ? `${pageNow[1]}` : `${pageNow[1]} / ${pageNow[2]}`;
+						docEle.innerHTML = pageNow[0];
+						/*langsDiv = document.createElement("div");
+						langsDiv.setAttribute("class", "langsDiv");
+						docEle.prepend(langsDiv);
+						langsIncluded.forEach((langIncluded) => {
+							langsEle = document.createElement("div");
+							langsEle.setAttribute("class", "langsEle");
+							langsDiv.append(langsEle);
+							langsEle.innerHTML = langIncluded;
+						});
+						if (langsIncluded.length != langs.length) {
+							langsDiv.classList.add('langsIncomplete');
+						}*/
 						parentEle.append(docEle);
 					});
 				}
@@ -491,6 +531,7 @@
 
 		let selectedLang;
 		let selectedResource;
+		let selectedResourceType;
 		let selectedKey;
 		let changeTimer = false;
 
@@ -498,9 +539,10 @@
 			let data = {
 				"session": sessionId,
 				"resource": selectedResource,
+				"resourceType": selectedResourceType,
 				"trKey": selectedKey,
 				"lang": selectedLang,
-				"trValue": document.getElementById(`${selectedLang}___${selectedResource}___${selectedKey}`).value
+				"trValue": document.getElementById(`${selectedLang}___${selectedResource}___${selectedKey}___${selectedResourceType}`).value
 			}
 
 			fetch("/updatetrans", {
@@ -524,6 +566,7 @@
 			selectedLang = splits[0];
 			selectedResource = splits[1];
 			selectedKey = splits[2];
+			selectedResourceType = splits[3];
 			if (changeTimer) {
 				clearTimeout(changeTimer);
 			}
@@ -531,10 +574,11 @@
 			hideNotification();
 		}
 
-		function pullTrans(resourceId = 0) {
+		function pullTrans(resourceId = 0, resourceType = 1) {
 			let data = {
 				"session": sessionId,
 				"resource": resourceId,
+				"resourceType": resourceType,
 				"scope": ""
 			}
 
@@ -587,9 +631,9 @@
 								transTd.setAttribute("class", "input_td");
 								transTr.append(transTd);
 								textArea = document.createElement('textarea');
-								textArea.setAttribute("id", `${lang}___${resourceId}___${trKey}`);
+								textArea.setAttribute("id", `${lang}___${resourceId}___${trKey}___${resourceType}`);
 
-								textArea.setAttribute("onkeyup", `syncChange("${lang}___${resourceId}___${trKey}")`);
+								textArea.setAttribute("onkeyup", `syncChange("${lang}___${resourceId}___${trKey}___${resourceType}")`);
 								transTd.append(textArea);
 								if (content.pages.hasOwnProperty(lang) && content.pages[lang].hasOwnProperty(trKey)) {
 									textArea.innerHTML = content.pages[lang][trKey]['value'];

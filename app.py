@@ -66,7 +66,7 @@ def sessionKeyExists(conn, cur, chatKey):
 		return False
 
 
-def cwCheckSession(conn, cur, chatKey):
+def cwCheckSession(conn, cur, chatKey, admin = False):
 	cur.execute("select session_data from django_session where session_key like %s", (chatKey,))
 	for row in cur:
 		sessionData = row[0]
@@ -76,7 +76,10 @@ def cwCheckSession(conn, cur, chatKey):
 		theString = json.loads(base64.b64decode(sessionData).decode().split(":", 1)[-1])
 		print(theString)
 		userId = int(theString['_auth_user_id'])
-		cur.execute("select user_id, first_name from account_user_groups left join account_user on account_user.id = user_id  where user_id = %s", (userId,))
+		if admin:
+			cur.execute("select user_id, first_name from account_user_groups left join account_user on account_user.id = user_id  where user_id = %s and account_user.is_superuser = 1", (userId,))
+		else:
+			cur.execute("select user_id, first_name from account_user_groups left join account_user on account_user.id = user_id  where user_id = %s", (userId,))
 	
 		for subrow in cur:
 			if subrow[0] == userId:
@@ -164,7 +167,7 @@ def pull(scope: PullScope):
 	if cur.rowcount > 0:
 		return {"status": 0, "error": "A pull request is still being processed"}
 
-	cur.execute("insert into queue (pull, pages, collections, scope) values (1, %s, %s, %s)", (scope.pages, scope.collections, scope.scope))
+	cur.execute("insert into queue (pull, pages, collections, scope, assets) values (1, %s, %s, %s, %s)", (scope.pages, scope.collections, scope.scope, scope.assets))
 	conn.commit()
 	return {"status": 1, "content": "Pull request queued"}
 
@@ -212,6 +215,7 @@ def pullcontent(scope: PullScope):
 	conn, cur = dbConnect()
 	pages = []
 	collections = []
+	assets = []
 
 	if scope.pages == 1:
 		cur.execute("select id, handle, template_suffix, langs from page order by handle")
@@ -225,7 +229,13 @@ def pullcontent(scope: PullScope):
 		for row in rows:
 			collections.append(row)
 
-	return {"status": 1, "content": {"pages": pages, "collections": collections}}
+	if scope.assets == 1:
+		cur.execute("select admin_graphql_api_id from asset")
+		rows = cur.fetchall()
+		for row in rows:
+			assets.append(row)
+
+	return {"status": 1, "content": {"pages": pages, "collections": collections, "assets": assets}}
 
 
 @app.post('/pulltrans')
@@ -249,7 +259,7 @@ def pulltrans(scope: PullTransScope):
 
 	resourceTrans = {}
 	if scope.resource > 0:
-		cur.execute("select id, tr_key, tr_value, lang from translatable where resource_id = %s", (scope.resource, ))
+		cur.execute("select id, tr_key, tr_value, lang from translatable where resource_id = %s and resource_type = %s", (scope.resource, scope.resourceType))
 		rows = cur.fetchall()
 
 		for row in rows:
@@ -379,7 +389,7 @@ def pageCSV(session: str, category: int = 1):
 	spreadsheet.share(None, perm_type='anyone', role='writer')
 
 
-	cur.execute("select page.id, page.handle, tr_key, tr_value, lang from translatable join page on resource_id = page.id order by resource_id, tr_key, lang")
+	cur.execute("select page.id, page.handle, tr_key, tr_value, lang from translatable join page on resource_id = page.id and resource_type = 1 order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
 	body = compileCSV(rows)
 
@@ -395,7 +405,7 @@ def pageCSV(session: str, category: int = 1):
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
-	cur.execute("select collection.id, collection.handle, tr_key, tr_value, lang, title, description, descriptionHtml from translatable join collection on resource_id = collection.id where tr_key not like 'handle' order by resource_id, tr_key, lang")
+	cur.execute("select collection.id, collection.handle, tr_key, tr_value, lang, title, description, descriptionHtml from translatable join collection on resource_id = collection.id and resource_type = 2 where tr_key not like 'handle' order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
 	body = compileCSV(rows, True)
 
@@ -411,7 +421,7 @@ def pageCSV(session: str, category: int = 1):
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
-	cur.execute("select asset.id, asset.handle, tr_key, tr_value, lang, title, description, descriptionHtml from translatable join asset on resource_id = asset.id where tr_key not like 'handle' order by resource_id, tr_key, lang")
+	cur.execute("select asset.id, asset.admin_graphql_api_id, tr_key, tr_value, lang from translatable join asset on resource_id = asset.id and resource_type = 3 where tr_key not like 'handle' order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
 	body = compileCSV(rows, True, True)
 
@@ -559,7 +569,7 @@ def push(session: str):
 
 	cw_conn, cw_cur = cwDbConnect()
 
-	userId, firstName = cwCheckSession(cw_conn, cw_cur, session)
+	userId, firstName = cwCheckSession(cw_conn, cw_cur, session, True)
 	if not userId:
 		return {"status": 0, "error": "could not verify session"}
 
