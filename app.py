@@ -264,7 +264,7 @@ def pulltrans(scope: PullTransScope):
 	return {"status": 1, "content": {"pages": resourceTrans}}
 
 
-def compileCSV(rows, isColl = False):
+def compileCSV(rows, isColl = False, isAsset = False):
 	collTitle = {"title": 5, "description": 6, "body_html": 7, "descriptionHtml": 7}
 	theLangs = ["en", "de", "fr", "es", "ja"]
 	csv = ""
@@ -313,11 +313,17 @@ def compileCSV(rows, isColl = False):
 				currentLang = row[4]
 				keyLang[currentLang] = theValue
 			else:
-				theValue = row[3] if row[3] is not None else ""
-				#current = [row[0], theHandle, theKey]
-				current = [f"https://comfort-works.com/pages/{theHandle}", theHandle, theKey]
-				currentLang = row[4]
-				keyLang[currentLang] = theValue
+				if isAsset:
+					theValue = row[3] if row[3] is not None else ""
+					current = ["", "", theKey]
+					currentLang = row[4]
+					keyLang[currentLang] = theValue
+				else:
+					theValue = row[3] if row[3] is not None else ""
+					#current = [row[0], theHandle, theKey]
+					current = [f"https://comfort-works.com/pages/{theHandle}", theHandle, theKey]
+					currentLang = row[4]
+					keyLang[currentLang] = theValue
 		else:
 			currentLang = row[4]
 			theValue = row[3] if row[3] is not None else ""
@@ -407,7 +413,7 @@ def pageCSV(session: str, category: int = 1):
 
 	cur.execute("select asset.id, asset.handle, tr_key, tr_value, lang, title, description, descriptionHtml from translatable join asset on resource_id = asset.id where tr_key not like 'handle' order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
-	body = compileCSV(rows, True)
+	body = compileCSV(rows, True, True)
 
 	lines = len(body)
 	columns = len(body[0])
