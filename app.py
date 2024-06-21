@@ -381,10 +381,10 @@ def pageCSV(session: str, category: int = 1):
 	#spreadsheet = (service.spreadsheets().create(body=spreadsheet, fields="spreadsheetId").execute())
 
 
-	currentSheetId = None
+	gsheetid = None
 	cur.execute("select gsheetid from gsheet")
 	if cur.rowcount > 0:
-		currentSheetId = cur.fetchone()[0]
+		gsheetid = cur.fetchone()[0]
 
 	scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
 	creds = service_account.Credentials.from_service_account_file("gsheetapi.json", scopes=scopes)
@@ -392,12 +392,20 @@ def pageCSV(session: str, category: int = 1):
 	spreadsheet = None
 	if currentSheetId is None:
 		spreadsheet = client.create(title)
+		gsheetid = spreadsheet.id
+		cur.execute("delete from gsheet")
+		conn.commit()
+		cur.execute("insert into gsheet (gsheetid) values (%s)", (gsheetid, ))
 	else:
-		spreadsheet = client.open_by_key(scope.url)
-	gsheetid = spreadsheet.id
-	cur.execute("delete from gsheet")
-	conn.commit()
-	cur.execute("insert into gsheet (gsheetid) values (%s)", (gsheetid, ))
+		try:
+			spreadsheet = client.open_by_key(gsheetid)
+		except:
+			spreadsheet = client.create(title)
+			gsheetid = spreadsheet.id
+			cur.execute("delete from gsheet")
+			conn.commit()
+			cur.execute("insert into gsheet (gsheetid) values (%s)", (gsheetid, ))
+
 
 	spreadsheet.share(None, perm_type='anyone', role='writer')
 
