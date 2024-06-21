@@ -390,7 +390,7 @@ def pageCSV(session: str, category: int = 1):
 	creds = service_account.Credentials.from_service_account_file("gsheetapi.json", scopes=scopes)
 	client = gspread.authorize(creds)
 	spreadsheet = None
-	if currentSheetId is None:
+	if gsheetid is None:
 		spreadsheet = client.create(title)
 		gsheetid = spreadsheet.id
 		cur.execute("delete from gsheet")
