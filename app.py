@@ -313,27 +313,28 @@ def compileCSV(rows, isColl = False, isAsset = False):
 			currentKey = row[2]
 			theHandle = row[1] if row[1] is not None else ""
 			theKey = row[2] if row[2] is not None else ""
-			if isColl and theKey in collTitle.keys():
-				theValue = row[collTitle[theKey]] if row[collTitle[theKey]] is not None else ""
-				currentLang = 'en'
-				current = [f"https://comfort-works.com/collections/{theHandle}", theHandle, theKey]
-				keyLang[currentLang] = theValue
-				theValue = row[3] if row[3] is not None else ""
-				#current.append('"' + theValue + '"')
-				currentLang = row[4]
-				keyLang[currentLang] = theValue
-			else:
-				if isAsset:
+			if theKey != "handle":
+				if isColl and theKey in collTitle.keys():
+					theValue = row[collTitle[theKey]] if row[collTitle[theKey]] is not None else ""
+					currentLang = 'en'
+					current = [f"https://comfort-works.com/collections/{theHandle}", theHandle, theKey]
+					keyLang[currentLang] = theValue
 					theValue = row[3] if row[3] is not None else ""
-					current = ["", "", theKey]
+					#current.append('"' + theValue + '"')
 					currentLang = row[4]
 					keyLang[currentLang] = theValue
 				else:
-					theValue = row[3] if row[3] is not None else ""
-					#current = [row[0], theHandle, theKey]
-					current = [f"https://comfort-works.com/pages/{theHandle}", theHandle, theKey]
-					currentLang = row[4]
-					keyLang[currentLang] = theValue
+					if isAsset:
+						theValue = row[3] if row[3] is not None else ""
+						current = [row[5], "", theKey]
+						currentLang = row[4]
+						keyLang[currentLang] = theValue
+					else:
+						theValue = row[3] if row[3] is not None else ""
+						#current = [row[0], theHandle, theKey]
+						current = [f"https://comfort-works.com/pages/{theHandle}", theHandle, theKey]
+						currentLang = row[4]
+						keyLang[currentLang] = theValue
 		else:
 			currentLang = row[4]
 			theValue = row[3] if row[3] is not None else ""
@@ -410,7 +411,7 @@ def pageCSV(session: str, category: int = 1):
 	spreadsheet.share(None, perm_type='anyone', role='writer')
 
 
-	cur.execute("select page.id, page.handle, tr_key, tr_value, lang from translatable join page on resource_id = page.id and resource_type = 1 order by resource_id, tr_key, lang")
+	cur.execute("select page.id, page.handle, tr_key, tr_value, lang, template_suffix from translatable join page on resource_id = page.id and resource_type = 1 order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
 	body = compileCSV(rows)
 
