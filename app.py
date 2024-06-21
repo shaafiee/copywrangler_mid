@@ -411,7 +411,7 @@ def pageCSV(session: str, category: int = 1):
 	spreadsheet.share(None, perm_type='anyone', role='writer')
 
 
-	cur.execute("select page.id, page.handle, tr_key, tr_value, lang, template_suffix from translatable join page on resource_id = page.id and resource_type = 1 order by resource_id, tr_key, lang")
+	cur.execute("select page.id, page.handle, tr_key, tr_value, lang from translatable join page on resource_id = page.id and resource_type = 1 order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
 	body = compileCSV(rows)
 
@@ -443,7 +443,7 @@ def pageCSV(session: str, category: int = 1):
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
-	cur.execute("select asset.id, asset.admin_graphql_api_id, tr_key, tr_value, lang from translatable join asset on resource_id = asset.id and resource_type = 3 where tr_key not like 'handle' order by resource_id, tr_key, lang")
+	cur.execute("select asset.id, asset.admin_graphql_api_id, tr_key, tr_value, lang, exact_url from translatable join asset on resource_id = asset.id and resource_type = 3 where tr_key not like 'handle' order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
 	body = compileCSV(rows, True, True)
 
