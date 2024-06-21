@@ -380,11 +380,24 @@ def pageCSV(session: str, category: int = 1):
 	#spreadsheet = {"properties": {"title": title}}
 	#spreadsheet = (service.spreadsheets().create(body=spreadsheet, fields="spreadsheetId").execute())
 
+
+	currentSheetId = None
+	cur.execute("select gsheetid from gsheet")
+	if cur.rowcount > 0:
+		currentSheetId = cur.fetchone()[0]
+
 	scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
 	creds = service_account.Credentials.from_service_account_file("gsheetapi.json", scopes=scopes)
 	client = gspread.authorize(creds)
-	spreadsheet = client.create(title)
+	spreadsheet = None
+	if currentSheetId is None:
+		spreadsheet = client.create(title)
+	else:
+		spreadsheet = client.open_by_key(scope.url)
 	gsheetid = spreadsheet.id
+	cur.execute("delete from gsheet")
+	conn.commit()
+	cur.execute("insert into gsheet (gsheetid) values (%s)", (gsheetid, ))
 
 	spreadsheet.share(None, perm_type='anyone', role='writer')
 
