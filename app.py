@@ -397,6 +397,7 @@ def pageCSV(session: str, category: int = 1):
 		cur.execute("delete from gsheet")
 		conn.commit()
 		cur.execute("insert into gsheet (gsheetid) values (%s)", (gsheetid, ))
+		conn.commit()
 	else:
 		try:
 			spreadsheet = client.open_by_key(gsheetid)
@@ -412,6 +413,7 @@ def pageCSV(session: str, category: int = 1):
 			cur.execute("delete from gsheet")
 			conn.commit()
 			cur.execute("insert into gsheet (gsheetid) values (%s)", (gsheetid, ))
+			conn.commit()
 
 
 	spreadsheet.share(None, perm_type='anyone', role='writer')
