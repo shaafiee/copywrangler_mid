@@ -449,7 +449,7 @@ def pageCSV(session: str, category: int = 1):
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
-	cur.execute("select asset.id, asset.admin_graphql_api_id, tr_key, tr_value, lang, exact_url from translatable join asset on resource_id = asset.id and resource_type = 3 where tr_key not like 'handle' order by resource_id, tr_key, lang")
+	cur.execute("select asset.id, asset.admin_graphql_api_id, tr_key, tr_value, lang, exact_url from translatable join asset on resource_id = asset.id and resource_type = 3 where tr_key not like 'handle' order by tr_key")
 	rows = cur.fetchall()
 	body = compileCSV(rows, True, True)
 
