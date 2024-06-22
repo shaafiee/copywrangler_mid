@@ -400,6 +400,12 @@ def pageCSV(session: str, category: int = 1):
 	else:
 		try:
 			spreadsheet = client.open_by_key(gsheetid)
+			worksheet = spreadsheet.worksheet("Pages")
+			spreadsheet.del_worksheet(worksheet)
+			worksheet = spreadsheet.worksheet("Collections")
+			spreadsheet.del_worksheet(worksheet)
+			worksheet = spreadsheet.worksheet("Assets")
+			spreadsheet.del_worksheet(worksheet)
 		except:
 			spreadsheet = client.create(title)
 			gsheetid = spreadsheet.id
