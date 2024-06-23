@@ -157,7 +157,7 @@ def pull(scope: PullScope):
 
 	cw_conn, cw_cur = cwDbConnect()
 
-	userId, firstName = cwCheckSession(cw_conn, cw_cur, session)
+	userId, firstName = cwCheckSession(cw_conn, cw_cur, session, True)
 	if not userId:
 		return {"status": 0, "error": "could not verify session"}
 
