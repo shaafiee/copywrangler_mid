@@ -278,7 +278,7 @@ def validValue(value):
 	isValid = True
 	if re.search(r"^(https:\/\/|shopify:\/\/).*", value) and not re.search(r"(<|>)", value):
 		isValid = False
-	if re.search(r"^[A-Za-z0-9]+$"):
+	if re.search(r"^[A-Za-z0-9]+$", value):
 		isValid = False
 	return isValid
 	
