@@ -328,7 +328,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 			#if totalValues == len(theLangs) and (theKey in ["title", "meta_title", "body_html"] or isAsset) and validValue(keyLang('en')):
 			if True: 
 				#if isColl and theKey in collTitle.keys():
-				if isColl and theKey in ["title", "meta_title", "body_html"] and validValue(keyLang('en')):
+				if isColl and theKey in ["title", "meta_title", "body_html"] and validValue(keyLang['en']):
 					theValue = row[collTitle[theKey]] if row[collTitle[theKey]] is not None else ""
 					currentLang = 'en'
 					current = [f"https://comfort-works.com/collections/{theHandle}", theHandle, theKey]
@@ -339,7 +339,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 					keyLang[currentLang] = theValue
 				else:
 					#if isAsset:
-					if isAsset and theKey in ["title", "meta_title", "body_html"] and validValue(keyLang('en')):
+					if isAsset and theKey in ["title", "meta_title", "body_html"] and validValue(keyLang['en']):
 						theValue = row[3] if row[3] is not None else ""
 						current = [row[5], "", theKey]
 						currentLang = row[4]
