@@ -302,7 +302,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 			if currentKey is not None:
 				langsComposed = True
 				#preJoin = ','.join(current)
-				if totalValues < len(keyLang) and validValue(keyLang['en']):
+				if totalValues < len(keyLang) and 'en' in keyLang.keys() and validValue(keyLang['en']):
 					if isColl:
 						if not re.search(r"^[A-Za-z0-9]+\-[A-Za-z0-9]+(\-[A-Za-z0-9]+)*"):
 							body.append(current)
