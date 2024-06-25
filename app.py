@@ -369,7 +369,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 			keyLang[currentLang] = theValue
 			if len(theValue) > 0:
 				totalValues += 1
-			if currentLang not in theLangs:
+			if currentLang not in theLangs.keys():
 				theLangs.append(currentLang)
 			#theValue = row[3] if row[3] is not None else ""
 			#current.append('"' + theValue + '"')
