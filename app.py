@@ -305,10 +305,10 @@ def compileCSV(rows, isColl = False, isAsset = False):
 				langsComposed = True
 				#preJoin = ','.join(current)
 				totalValues = 0
-				for aValue in current[-5:]:
+				for aValue in current[len(theLangs) * -1:]:
 					if len(aValue) > 2:
 						totalValues = totalValues + 1
-				if totalValues < 5 and 'en' in keyLang.keys() and validValue(keyLang['en']):
+				if totalValues < len(theLangs) and 'en' in keyLang.keys() and validValue(keyLang['en']):
 					if isColl:
 						if not re.search(r"^[A-Za-z0-9]+(\-|_)[A-Za-z0-9]+((\-|_)[A-Za-z0-9]+)*", keyLang['en']):
 							body.append(current)
