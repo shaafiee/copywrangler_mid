@@ -304,7 +304,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 			if currentKey is not None:
 				langsComposed = True
 				#preJoin = ','.join(current)
-				if totalValues < len(keyLang.keys()) and 'en' in keyLang.keys() and validValue(keyLang['en']):
+				if totalValues < len(theLangs) and 'en' in keyLang.keys() and validValue(keyLang['en']):
 					if isColl:
 						if not re.search(r"^[A-Za-z0-9]+(\-|_)[A-Za-z0-9]+((\-|_)[A-Za-z0-9]+)*", keyLang['en']):
 							body.append(current)
@@ -364,12 +364,12 @@ def compileCSV(rows, isColl = False, isAsset = False):
 							if len(theValue) > 0:
 								totalValues += 1
 		else:
-			currentLang = row[4]
+			currentLang = row[4].lower()
 			theValue = row[3] if row[3] is not None else ""
 			keyLang[currentLang] = theValue
 			if len(theValue) > 0:
 				totalValues += 1
-			if currentLang not in theLangs.keys():
+			if currentLang not in theLangs:
 				theLangs.append(currentLang)
 			#theValue = row[3] if row[3] is not None else ""
 			#current.append('"' + theValue + '"')
