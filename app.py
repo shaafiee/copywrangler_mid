@@ -420,7 +420,7 @@ def pageCSV(session: str, category: int = 1):
 			conn.commit()
 
 
-	spreadsheet.share('comfort-works.com', perm_type='domain', role='owner')
+	spreadsheet.share('comfort-works.com', perm_type='domain', role='writer')
 
 
 	try:
