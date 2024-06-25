@@ -306,9 +306,9 @@ def compileCSV(rows, isColl = False, isAsset = False):
 				#preJoin = ','.join(current)
 				totalValues = 0
 				for aValue in current[len(theLangs) * -1:]:
-					if len(aValue) > 2:
+					if len(aValue) < 2:
 						totalValues = totalValues + 1
-				if totalValues < len(theLangs) - 1 and 'en' in keyLang.keys() and validValue(keyLang['en']):
+				if totalValues > 0 and 'en' in keyLang.keys() and validValue(keyLang['en']):
 					if isColl:
 						if not re.search(r"^[A-Za-z0-9]+(\-|_)[A-Za-z0-9]+((\-|_)[A-Za-z0-9]+)*", keyLang['en']):
 							body.append(current)
