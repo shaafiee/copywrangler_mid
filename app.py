@@ -278,6 +278,8 @@ def validValue(value):
 	isValid = True
 	if re.search(r"^(https:\/\/|shopify:\/\/).*", value) and not re.search(r"(<|>)", value):
 		isValid = False
+	if re.search(r"^[A-Za-z0-9]+$"):
+		isValid = False
 	return isValid
 	
 
@@ -304,7 +306,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 				#preJoin = ','.join(current)
 				if totalValues < len(keyLang.keys()) and 'en' in keyLang.keys() and validValue(keyLang['en']):
 					if isColl:
-						if not re.search(r"^[A-Za-z0-9]+\-[A-Za-z0-9]+(\-[A-Za-z0-9]+)*", keyLang['en']):
+						if not re.search(r"^[A-Za-z0-9]+(\-|_)[A-Za-z0-9]+((\-|_)[A-Za-z0-9]+)*", keyLang['en']):
 							body.append(current)
 					else:
 						body.append(current)
@@ -342,12 +344,16 @@ def compileCSV(rows, isColl = False, isAsset = False):
 						#current.append('"' + theValue + '"')
 						currentLang = row[4]
 						keyLang[currentLang] = theValue
+						if len(theValue) > 0:
+							totalValues += 1
 				else:
 					if isAsset:
 						theValue = row[3] if row[3] is not None else ""
 						current = [row[5], "", theKey]
 						currentLang = row[4]
 						keyLang[currentLang] = theValue
+						if len(theValue) > 0:
+							totalValues += 1
 					else:
 						if theKey in ["title", "meta_title", "body_html"]:
 							theValue = row[3] if row[3] is not None else ""
@@ -355,10 +361,14 @@ def compileCSV(rows, isColl = False, isAsset = False):
 							current = [f"https://comfort-works.com/pages/{theHandle}", theHandle, theKey]
 							currentLang = row[4]
 							keyLang[currentLang] = theValue
+							if len(theValue) > 0:
+								totalValues += 1
 		else:
 			currentLang = row[4]
 			theValue = row[3] if row[3] is not None else ""
 			keyLang[currentLang] = theValue
+			if len(theValue) > 0:
+				totalValues += 1
 			if currentLang not in theLangs:
 				theLangs.append(currentLang)
 			#theValue = row[3] if row[3] is not None else ""
