@@ -274,6 +274,14 @@ def pulltrans(scope: PullTransScope):
 	return {"status": 1, "content": {"pages": resourceTrans}}
 
 
+def validValue(value):
+	isValid = True
+	if re.search(r"^(https:\/\/|shopify:\/\/).*", value) and not re.search(r"(<|>)", value):
+		isValid = False
+	return isValid
+	
+
+
 def compileCSV(rows, isColl = False, isAsset = False):
 	collTitle = {"title": 5, "description": 6, "body_html": 7, "descriptionHtml": 7}
 	theLangs = ["en", "de", "fr", "es", "ja"]
@@ -289,6 +297,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 	currentLang = None
 	for row in rows:
 		if row[2] != currentKey:
+			totalValues = 0
 			if currentKey is not None:
 				langsComposed = True
 				#preJoin = ','.join(current)
@@ -302,6 +311,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 						#	if not isColl or (isColl and theLang == 'en' and theLang in keyLang.keys()):
 						#		current.append(keyLang[theLang])
 						current.append(keyLang[theLang])
+						totalValues += 1
 					else:
 						#if isColl and theLang != 'en':
 						#	current.append("")
@@ -313,7 +323,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 			currentKey = row[2]
 			theHandle = row[1] if row[1] is not None else ""
 			theKey = row[2] if row[2] is not None else ""
-			if theKey != "handle":
+			if totalValues == len(theLangs) and (theKey in ["title", "meta_title", "body_html"] or isAsset) and validValue(keyLang('en')):
 				if isColl and theKey in collTitle.keys():
 					theValue = row[collTitle[theKey]] if row[collTitle[theKey]] is not None else ""
 					currentLang = 'en'
@@ -401,12 +411,21 @@ def pageCSV(session: str, category: int = 1):
 	else:
 		try:
 			spreadsheet = client.open_by_key(gsheetid)
-			worksheet = spreadsheet.worksheet("Pages")
-			spreadsheet.del_worksheet(worksheet)
-			worksheet = spreadsheet.worksheet("Collections")
-			spreadsheet.del_worksheet(worksheet)
-			worksheet = spreadsheet.worksheet("Assets")
-			spreadsheet.del_worksheet(worksheet)
+			try:
+				worksheet = spreadsheet.worksheet("Pages")
+				spreadsheet.del_worksheet(worksheet)
+			except:
+				pass
+			try:
+				worksheet = spreadsheet.worksheet("Collections")
+				spreadsheet.del_worksheet(worksheet)
+			except:
+				pass
+			try:
+				worksheet = spreadsheet.worksheet("Assets")
+				spreadsheet.del_worksheet(worksheet)
+			except:
+				pass
 		except:
 			spreadsheet = client.create(title)
 			gsheetid = spreadsheet.id
@@ -467,8 +486,8 @@ def pageCSV(session: str, category: int = 1):
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
-	delWorksheet = spreadsheet.get_worksheet(0)
-	spreadsheet.del_worksheet(delWorksheet)
+	#delWorksheet = spreadsheet.get_worksheet(0)
+	#spreadsheet.del_worksheet(delWorksheet)
 
 	return {"status": 1, "gsheet": gsheetid}
 
