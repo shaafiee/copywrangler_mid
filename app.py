@@ -306,7 +306,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 				#preJoin = ','.join(current)
 				totalValues = 0
 				for idx, aValue in enumerate(current):
-					if idx > 2 and len(aValue) < 2:
+					if idx > 2 and (len(aValue) < 2 or aValue == ""):
 						totalValues = totalValues + 1
 				if totalValues > 0 and 'en' in keyLang.keys() and validValue(keyLang['en']):
 					if isColl:
