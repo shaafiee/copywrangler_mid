@@ -305,8 +305,8 @@ def compileCSV(rows, isColl = False, isAsset = False):
 				langsComposed = True
 				#preJoin = ','.join(current)
 				totalValues = 0
-				for aValue in current[len(theLangs) * -1:]:
-					if len(aValue) < 2:
+				for idx, aValue in enumerate(current):
+					if idx > 2 and len(aValue) < 2:
 						totalValues = totalValues + 1
 				if totalValues > 0 and 'en' in keyLang.keys() and validValue(keyLang['en']):
 					if isColl:
