@@ -411,21 +411,6 @@ def pageCSV(session: str, category: int = 1):
 	else:
 		try:
 			spreadsheet = client.open_by_key(gsheetid)
-			try:
-				worksheet = spreadsheet.worksheet("Pages")
-				spreadsheet.del_worksheet(worksheet)
-			except:
-				pass
-			try:
-				worksheet = spreadsheet.worksheet("Collections")
-				spreadsheet.del_worksheet(worksheet)
-			except:
-				pass
-			try:
-				worksheet = spreadsheet.worksheet("Assets")
-				spreadsheet.del_worksheet(worksheet)
-			except:
-				pass
 		except:
 			spreadsheet = client.create(title)
 			gsheetid = spreadsheet.id
@@ -435,9 +420,14 @@ def pageCSV(session: str, category: int = 1):
 			conn.commit()
 
 
-	spreadsheet.share(None, perm_type='anyone', role='writer')
+	spreadsheet.share('comfort-works.com', perm_type='domain', role='owner')
 
 
+	try:
+		worksheet = spreadsheet.worksheet("Pages")
+		spreadsheet.del_worksheet(worksheet)
+	except:
+		pass
 	cur.execute("select page.id, page.handle, tr_key, tr_value, lang from translatable join page on resource_id = page.id and resource_type = 1 order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
 	body = compileCSV(rows)
@@ -454,6 +444,11 @@ def pageCSV(session: str, category: int = 1):
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
+	try:
+		worksheet = spreadsheet.worksheet("Collections")
+		spreadsheet.del_worksheet(worksheet)
+	except:
+		pass
 	cur.execute("select collection.id, collection.handle, tr_key, tr_value, lang, title, description, descriptionHtml from translatable join collection on resource_id = collection.id and resource_type = 2 where tr_key not like 'handle' order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
 	body = compileCSV(rows, True)
@@ -470,6 +465,11 @@ def pageCSV(session: str, category: int = 1):
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
+	try:
+		worksheet = spreadsheet.worksheet("Assets")
+		spreadsheet.del_worksheet(worksheet)
+	except:
+		pass
 	cur.execute("select asset.id, asset.admin_graphql_api_id, tr_key, tr_value, lang, exact_url from translatable join asset on resource_id = asset.id and resource_type = 3 where tr_key not like 'handle' order by tr_key")
 	rows = cur.fetchall()
 	body = compileCSV(rows, True, True)
