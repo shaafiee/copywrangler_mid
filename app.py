@@ -302,7 +302,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 			if currentKey is not None:
 				langsComposed = True
 				#preJoin = ','.join(current)
-				if totalValues < len(keyLang) and 'en' in keyLang.keys() and validValue(keyLang['en']):
+				if totalValues < len(keyLang.keys()) and 'en' in keyLang.keys() and validValue(keyLang['en']):
 					if isColl:
 						if not re.search(r"^[A-Za-z0-9]+\-[A-Za-z0-9]+(\-[A-Za-z0-9]+)*", keyLang['en']):
 							body.append(current)
@@ -343,8 +343,6 @@ def compileCSV(rows, isColl = False, isAsset = False):
 						currentLang = row[4]
 						keyLang[currentLang] = theValue
 				else:
-					#if isAsset:
-					currentLang = 'en'
 					if isAsset:
 						theValue = row[3] if row[3] is not None else ""
 						current = [row[5], "", theKey]
@@ -484,7 +482,7 @@ def pageCSV(session: str, category: int = 1):
 		pass
 	cur.execute("select asset.id, asset.admin_graphql_api_id, tr_key, tr_value, lang, exact_url from translatable join asset on resource_id = asset.id and resource_type = 3 where tr_key not like 'handle' order by tr_key")
 	rows = cur.fetchall()
-	body = compileCSV(rows, True, True)
+	body = compileCSV(rows, False, True)
 
 	lines = len(body)
 	columns = len(body[0])
