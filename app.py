@@ -36,8 +36,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import gspread
-from gspread-formatting import *
 from hashlib import sha256
+from gspread_formatting import *
 
 
 app = FastAPI()
