@@ -475,7 +475,7 @@ def pageCSV(session: str, category: int = 1):
 		if counter >= 1400:
 			format_cell_ranges(worksheet, toFormat)
 			counter = 0
-	if length(toFormat) > 0:
+	if len(toFormat) > 0:
 		format_cell_ranges(worksheet, toFormat)
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
@@ -507,7 +507,7 @@ def pageCSV(session: str, category: int = 1):
 		if counter >= 1400:
 			format_cell_ranges(worksheet, toFormat)
 			counter = 0
-	if length(toFormat) > 0:
+	if len(toFormat) > 0:
 		format_cell_ranges(worksheet, toFormat)
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
@@ -539,7 +539,7 @@ def pageCSV(session: str, category: int = 1):
 		if counter >= 1400:
 			format_cell_ranges(worksheet, toFormat)
 			counter = 0
-	if length(toFormat) > 0:
+	if len(toFormat) > 0:
 		format_cell_ranges(worksheet, toFormat)
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
