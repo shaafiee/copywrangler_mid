@@ -468,9 +468,15 @@ def pageCSV(session: str, category: int = 1):
 
 	worksheet.update(rangeName, body)
 	toFormat = []
+	counter = 0
 	for needTrans in compiled["marked"]:
+		counter = counter + 1
 		toFormat.append((f"A{needTrans}:{endColumn}{needTrans}", curFmt))
-	format_cell_ranges(worksheet, toFormat)
+		if counter >= 1400:
+			format_cell_ranges(worksheet, toFormat)
+			counter = 0
+	if length(toFormat) > 0:
+		format_cell_ranges(worksheet, toFormat)
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
@@ -494,9 +500,15 @@ def pageCSV(session: str, category: int = 1):
 
 	worksheet.update(rangeName, body)
 	toFormat = []
+	counter = 0
 	for needTrans in compiled["marked"]:
+		counter = counter + 1
 		toFormat.append((f"A{needTrans}:{endColumn}{needTrans}", curFmt))
-	format_cell_ranges(worksheet, toFormat)
+		if counter >= 1400:
+			format_cell_ranges(worksheet, toFormat)
+			counter = 0
+	if length(toFormat) > 0:
+		format_cell_ranges(worksheet, toFormat)
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
@@ -520,9 +532,15 @@ def pageCSV(session: str, category: int = 1):
 
 	worksheet.update(rangeName, body)
 	toFormat = []
+	counter = 0
 	for needTrans in compiled["marked"]:
+		counter = counter + 1
 		toFormat.append((f"A{needTrans}:{endColumn}{needTrans}", curFmt))
-	format_cell_ranges(worksheet, toFormat)
+		if counter >= 1400:
+			format_cell_ranges(worksheet, toFormat)
+			counter = 0
+	if length(toFormat) > 0:
+		format_cell_ranges(worksheet, toFormat)
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
