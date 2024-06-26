@@ -36,6 +36,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import gspread
+from gspread-formatting import *
 from hashlib import sha256
 
 
@@ -466,8 +467,10 @@ def pageCSV(session: str, category: int = 1):
 	worksheet = spreadsheet.add_worksheet("Pages", rows=lines, cols=columns)
 
 	worksheet.update(rangeName, body)
+	toFormat = []
 	for needTrans in compiled["marked"]:
-		worksheet.format(f"A{needTrans}:{endColumn}{needTrans}", {"backgroundColor": {"red": .99, "green": .80, "blue": .80, "alpha": 1}})
+		toFormat.append({f"A{needTrans}:{endColumn}{needTrans}", {"backgroundColor": {"red": .99, "green": .80, "blue": .80, "alpha": 1}}})
+	format_cell_ranges(worksheet, toFormat)
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
@@ -490,8 +493,10 @@ def pageCSV(session: str, category: int = 1):
 	worksheet = spreadsheet.add_worksheet("Collections", rows=lines, cols=columns)
 
 	worksheet.update(rangeName, body)
+	toFormat = []
 	for needTrans in compiled["marked"]:
-		worksheet.format(f"A{needTrans}:{endColumn}{needTrans}", {"backgroundColor": {"red": .99, "green": .80, "blue": .80, "alpha": 1}})
+		toFormat.append({f"A{needTrans}:{endColumn}{needTrans}", {"backgroundColor": {"red": .99, "green": .80, "blue": .80, "alpha": 1}}})
+	format_cell_ranges(worksheet, toFormat)
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
@@ -514,8 +519,10 @@ def pageCSV(session: str, category: int = 1):
 	worksheet = spreadsheet.add_worksheet("Assets", rows=lines, cols=columns)
 
 	worksheet.update(rangeName, body)
+	toFormat = []
 	for needTrans in compiled["marked"]:
-		worksheet.format(f"A{needTrans}:{endColumn}{needTrans}", {"backgroundColor": {"red": .99, "green": .80, "blue": .80, "alpha": 1}})
+		toFormat.append({f"A{needTrans}:{endColumn}{needTrans}", {"backgroundColor": {"red": .99, "green": .80, "blue": .80, "alpha": 1}}})
+	format_cell_ranges(worksheet, toFormat)
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
