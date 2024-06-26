@@ -276,11 +276,11 @@ def pulltrans(scope: PullTransScope):
 
 def validValue(value):
 	isValid = True
-	if re.search(r"^(https:\/\/|shopify:\/\/).*", value) and not re.search(r"(<|>)", value):
+	if re.search(r"^\s*(https:\/\/|shopify:\/\/)\S*\s*", value, re.M) and not re.search(r"(<|>)", value, re.M):
 		isValid = False
 	if re.search(r"^[A-Za-z0-9]+$", value):
 		isValid = False
-	if re.search(r"^\s*<svg.*</svg>\s*$", value):
+	if re.search(r"^\s*<svg.*</svg>\s*$", value, re.M):
 		isValid = False
 	return isValid
 	
@@ -308,17 +308,6 @@ def compileCSV(rows, isColl = False, isAsset = False):
 				langsComposed = True
 				#preJoin = ','.join(current)
 				totalValues = 0
-				for idx, aValue in enumerate(current):
-					if idx > 2:
-						if len(aValue) < 1:
-							totalValues = totalValues + 1
-				if not (len(langsAdded) >= len(theLangs)) and 'en' in keyLang.keys() and validValue(keyLang['en']):
-					if isColl:
-						if not re.search(r"^[A-Za-z0-9]+(\-|_)[A-Za-z0-9]+((\-|_)[A-Za-z0-9]+)*", keyLang['en']):
-							body.append(current)
-					else:
-						body.append(current)
-				#csv = f"{csv}{preJoin}\n"
 				for theLang in theLangs:
 					if theLang in keyLang.keys():
 						#if isColl and theLang != 'en':
@@ -333,7 +322,15 @@ def compileCSV(rows, isColl = False, isAsset = False):
 						#	current.append("")
 						#elif not isColl:
 						#	current.append("")
-						current.append("")
+						current.append('')
+				#if not (len(langsAdded) >= len(theLangs)) and 'en' in keyLang.keys() and validValue(keyLang['en']):
+				if 'en' in keyLang.keys() and validValue(keyLang['en']):
+					if isColl:
+						if not re.search(r"^[A-Za-z0-9]+(\-|_)[A-Za-z0-9]+((\-|_)[A-Za-z0-9]+)*", keyLang['en']):
+							body.append(current)
+					else:
+						body.append(current)
+				#csv = f"{csv}{preJoin}\n"
 				current = []
 				langsAdded = []
 				keyLang = {}
