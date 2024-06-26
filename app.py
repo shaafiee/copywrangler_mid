@@ -288,6 +288,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 	#collTitle = {"title": 5, "description": 6, "body_html": 7, "descriptionHtml": 7}
 	collTitle = {"title": 5, "body_html": 7}
 	theLangs = ["en", "de", "fr", "es", "ja"]
+	langsAdded = []
 	csv = ""
 	csvLangs = []
 	currentValues = []
@@ -309,7 +310,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 					if idx > 2:
 						if len(aValue) < 1:
 							totalValues = totalValues + 1
-				if totalValues > 0 and 'en' in keyLang.keys() and validValue(keyLang['en']):
+				if len(langsAdded.keys()) != len(theLangs.keys()) and 'en' in keyLang.keys() and validValue(keyLang['en']):
 					if isColl:
 						if not re.search(r"^[A-Za-z0-9]+(\-|_)[A-Za-z0-9]+((\-|_)[A-Za-z0-9]+)*", keyLang['en']):
 							body.append(current)
@@ -332,6 +333,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 						#	current.append("")
 						current.append("")
 				current = []
+				langsAdded = []
 				keyLang = {}
 			currentKey = row[2]
 			theHandle = row[1] if row[1] is not None else ""
@@ -347,12 +349,14 @@ def compileCSV(rows, isColl = False, isAsset = False):
 						theValue = row[3] if row[3] is not None else ""
 						#current.append('"' + theValue + '"')
 						currentLang = row[4]
+						langsAdded.append(currentLang)
 						keyLang[currentLang] = theValue
 				else:
 					if isAsset:
 						theValue = row[3] if row[3] is not None else ""
 						current = [row[5], "", theKey]
 						currentLang = row[4]
+						langsAdded.append(currentLang)
 						keyLang[currentLang] = theValue
 					else:
 						if theKey in ["title", "meta_title", "body_html"]:
@@ -360,11 +364,13 @@ def compileCSV(rows, isColl = False, isAsset = False):
 							#current = [row[0], theHandle, theKey]
 							current = [f"https://comfort-works.com/pages/{theHandle}", theHandle, theKey]
 							currentLang = row[4]
+							langsAdded.append(currentLang)
 							keyLang[currentLang] = theValue
 		else:
 			currentLang = row[4].lower()
 			theValue = row[3] if row[3] is not None else ""
 			keyLang[currentLang] = theValue
+			langsAdded.append(currentLang)
 			if currentLang not in theLangs:
 				theLangs.append(currentLang)
 			#theValue = row[3] if row[3] is not None else ""
