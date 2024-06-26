@@ -447,7 +447,7 @@ def pageCSV(session: str, category: int = 1):
 
 	spreadsheet.share('comfort-works.com', perm_type='domain', role='writer')
 
-
+	curFmt = cellFormat(backgroundColor=color(.99, .8, .8))
 	try:
 		worksheet = spreadsheet.worksheet("Pages")
 		spreadsheet.del_worksheet(worksheet)
@@ -469,7 +469,7 @@ def pageCSV(session: str, category: int = 1):
 	worksheet.update(rangeName, body)
 	toFormat = []
 	for needTrans in compiled["marked"]:
-		toFormat.append((f"A{needTrans}:{endColumn}{needTrans}", cellFormat(backgroundColor=(.99, .8, .8))))
+		toFormat.append((f"A{needTrans}:{endColumn}{needTrans}", curFmt))
 	format_cell_ranges(worksheet, toFormat)
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
@@ -495,7 +495,7 @@ def pageCSV(session: str, category: int = 1):
 	worksheet.update(rangeName, body)
 	toFormat = []
 	for needTrans in compiled["marked"]:
-		toFormat.append((f"A{needTrans}:{endColumn}{needTrans}", cellFormat(backgroundColor=(.99, .8, .8))))
+		toFormat.append((f"A{needTrans}:{endColumn}{needTrans}", curFmt))
 	format_cell_ranges(worksheet, toFormat)
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
@@ -521,8 +521,7 @@ def pageCSV(session: str, category: int = 1):
 	worksheet.update(rangeName, body)
 	toFormat = []
 	for needTrans in compiled["marked"]:
-		toFormat.append((f"A{needTrans}:{endColumn}{needTrans}", cellFormat(backgroundColor=(.99, .8, .8))))
-		#toFormat.append((f"A{needTrans}:{endColumn}{needTrans}", {"backgroundColor": {"red": .99, "green": .80, "blue": .80, "alpha": 1}}))
+		toFormat.append((f"A{needTrans}:{endColumn}{needTrans}", curFmt))
 	format_cell_ranges(worksheet, toFormat)
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
