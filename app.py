@@ -280,6 +280,8 @@ def validValue(value):
 		isValid = False
 	if re.search(r"^[A-Za-z0-9]+$", value):
 		isValid = False
+	if re.search(r"^<svg>.*</svg>$", value):
+		isValid = False
 	return isValid
 	
 
