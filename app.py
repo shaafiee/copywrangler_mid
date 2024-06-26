@@ -302,6 +302,8 @@ def compileCSV(rows, isColl = False, isAsset = False):
 	keyLang = {}
 	currentLang = None
 	totalValues = 0
+	marked = []
+	counter = 0
 	for row in rows:
 		if row[2] != currentKey:
 			if currentKey is not None:
@@ -319,7 +321,9 @@ def compileCSV(rows, isColl = False, isAsset = False):
 						totalValues += 1
 					else:
 						current.append('')
-
+				counter = counter + 1
+				if totalValues < len(theLangs):
+					marked.append(counter)
 				#if not (len(langsAdded) >= len(theLangs)) and 'en' in keyLang.keys() and validValue(keyLang['en']):
 				if 'en' in keyLang.keys() and validValue(keyLang['en']):
 					if isColl:
@@ -379,7 +383,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 	body.insert(0, header)
 	#preJoin = ','.join(header)
 	#csv = f"{preJoin}\n{csv}"
-	return body
+	return {"body": body, "marked": marked}
 
 
 @app.get('/pagecsv')
@@ -450,7 +454,8 @@ def pageCSV(session: str, category: int = 1):
 		pass
 	cur.execute("select page.id, page.handle, tr_key, tr_value, lang from translatable join page on resource_id = page.id and resource_type = 1 order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
-	body = compileCSV(rows)
+	compiled = compileCSV(rows)
+	body = compiled['body']
 
 	lines = len(body)
 	columns = len(body[0])
@@ -461,6 +466,8 @@ def pageCSV(session: str, category: int = 1):
 	worksheet = spreadsheet.add_worksheet("Pages", rows=lines, cols=columns)
 
 	worksheet.update(rangeName, body)
+	for needTrans in compiled["marked"]:
+		worksheet.format(f"A{needTrans}:{endColumn}{needTrans}", {"backgroundColor": {"red": .99, "green": .80, "blue": .80, "alpha": 1}})
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
@@ -471,7 +478,8 @@ def pageCSV(session: str, category: int = 1):
 		pass
 	cur.execute("select collection.id, collection.handle, tr_key, tr_value, lang, title, description, descriptionHtml from translatable join collection on resource_id = collection.id and resource_type = 2 where tr_key not like 'handle' order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
-	body = compileCSV(rows, True)
+	compiled = compileCSV(rows)
+	body = compiled['body']
 
 	lines = len(body)
 	columns = len(body[0])
@@ -482,6 +490,8 @@ def pageCSV(session: str, category: int = 1):
 	worksheet = spreadsheet.add_worksheet("Collections", rows=lines, cols=columns)
 
 	worksheet.update(rangeName, body)
+	for needTrans in compiled["marked"]:
+		worksheet.format(f"A{needTrans}:{endColumn}{needTrans}", {"backgroundColor": {"red": .99, "green": .80, "blue": .80, "alpha": 1}})
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
@@ -492,7 +502,8 @@ def pageCSV(session: str, category: int = 1):
 		pass
 	cur.execute("select asset.id, asset.admin_graphql_api_id, tr_key, tr_value, lang, exact_url from translatable join asset on resource_id = asset.id and resource_type = 3 where tr_key not like 'handle' order by tr_key")
 	rows = cur.fetchall()
-	body = compileCSV(rows, False, True)
+	compiled = compileCSV(rows)
+	body = compiled['body']
 
 	lines = len(body)
 	columns = len(body[0])
@@ -503,6 +514,8 @@ def pageCSV(session: str, category: int = 1):
 	worksheet = spreadsheet.add_worksheet("Assets", rows=lines, cols=columns)
 
 	worksheet.update(rangeName, body)
+	for needTrans in compiled["marked"]:
+		worksheet.format(f"A{needTrans}:{endColumn}{needTrans}", {"backgroundColor": {"red": .99, "green": .80, "blue": .80, "alpha": 1}})
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
