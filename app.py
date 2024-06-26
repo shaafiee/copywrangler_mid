@@ -318,18 +318,19 @@ def compileCSV(rows, isColl = False, isAsset = False):
 						current.append(keyLang[theLang])
 						totalValues += 1
 					else:
-						#if isColl and theLang != 'en':
-						#	current.append("")
-						#elif not isColl:
-						#	current.append("")
 						current.append('')
+
 				#if not (len(langsAdded) >= len(theLangs)) and 'en' in keyLang.keys() and validValue(keyLang['en']):
 				if 'en' in keyLang.keys() and validValue(keyLang['en']):
 					if isColl:
-						if not re.search(r"^[A-Za-z0-9]+(\-|_)[A-Za-z0-9]+((\-|_)[A-Za-z0-9]+)*", keyLang['en']):
+						if not re.search(r"^[A-Za-z0-9]+(\-|_)[A-Za-z0-9]+((\-|_)[A-Za-z0-9]+)*", keyLang['en']) and currentKey in collTitle.keys():
 							body.append(current)
 					else:
-						body.append(current)
+						if isAsset:
+							if currentKey in ["title", "meta_title", "body_html"]:
+								body.append(current)
+						else:
+							body.append(current)
 				#csv = f"{csv}{preJoin}\n"
 				current = []
 				langsAdded = []
@@ -340,16 +341,15 @@ def compileCSV(rows, isColl = False, isAsset = False):
 			#if totalValues == len(theLangs) and (theKey in ["title", "meta_title", "body_html"] or isAsset) and validValue(keyLang('en')):
 			if True: 
 				if isColl:
-					if theKey in collTitle.keys():
-						theValue = row[collTitle[theKey]] if row[collTitle[theKey]] is not None else ""
-						currentLang = 'en'
-						current = [f"https://comfort-works.com/collections/{theHandle}", theHandle, theKey]
-						keyLang[currentLang] = theValue
-						theValue = row[3] if row[3] is not None else ""
-						#current.append('"' + theValue + '"')
-						currentLang = row[4]
-						langsAdded.append(currentLang)
-						keyLang[currentLang] = theValue
+					theValue = row[collTitle[theKey]] if row[collTitle[theKey]] is not None else ""
+					currentLang = 'en'
+					current = [f"https://comfort-works.com/collections/{theHandle}", theHandle, theKey]
+					keyLang[currentLang] = theValue
+					theValue = row[3] if row[3] is not None else ""
+					#current.append('"' + theValue + '"')
+					currentLang = row[4]
+					langsAdded.append(currentLang)
+					keyLang[currentLang] = theValue
 				else:
 					if isAsset:
 						theValue = row[3] if row[3] is not None else ""
@@ -358,13 +358,12 @@ def compileCSV(rows, isColl = False, isAsset = False):
 						langsAdded.append(currentLang)
 						keyLang[currentLang] = theValue
 					else:
-						if theKey in ["title", "meta_title", "body_html"]:
-							theValue = row[3] if row[3] is not None else ""
-							#current = [row[0], theHandle, theKey]
-							current = [f"https://comfort-works.com/pages/{theHandle}", theHandle, theKey]
-							currentLang = row[4]
-							langsAdded.append(currentLang)
-							keyLang[currentLang] = theValue
+						theValue = row[3] if row[3] is not None else ""
+						#current = [row[0], theHandle, theKey]
+						current = [f"https://comfort-works.com/pages/{theHandle}", theHandle, theKey]
+						currentLang = row[4]
+						langsAdded.append(currentLang)
+						keyLang[currentLang] = theValue
 		else:
 			currentLang = row[4].lower()
 			theValue = row[3] if row[3] is not None else ""
