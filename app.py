@@ -279,9 +279,13 @@ def validValue(value):
 	isValid = True
 	if re.search(r"^\s*(https:\/\/|shopify:\/\/)\S*\s*", value, re.M) and not re.search(r"(<|>)", value, re.M):
 		isValid = False
-	if re.search(r"^[A-Za-z0-9]+$", value):
+	if re.search(r"^\s*[A-Za-z0-9\-\_]+\s*$", value, re.M):
 		isValid = False
-	if re.search(r"^\s*<svg.*</svg>\s*$", value, re.M):
+	if re.search(r"^\s*<svg", value, re.M):
+		isValid = False
+	if re.search(r"^\s*<script", value, re.M):
+		isValid = False
+	if re.search(r"^\s*<iframe", value, re.M):
 		isValid = False
 	return isValid
 	
@@ -313,11 +317,6 @@ def compileCSV(rows, isColl = False, isAsset = False):
 				totalValues = 0
 				for theLang in theLangs:
 					if theLang in keyLang.keys():
-						#if isColl and theLang != 'en':
-						#	current.append(keyLang[theLang])
-						#else:
-						#	if not isColl or (isColl and theLang == 'en' and theLang in keyLang.keys()):
-						#		current.append(keyLang[theLang])
 						current.append(keyLang[theLang])
 						totalValues += 1
 					else:
@@ -327,7 +326,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 				#if not (len(langsAdded) >= len(theLangs)) and 'en' in keyLang.keys() and validValue(keyLang['en']):
 				if 'en' in keyLang.keys() and validValue(keyLang['en']):
 					if isColl:
-						if not re.search(r"^\s*[A-Za-z0-9\-_]+\s*", keyLang['en']) and currentKey in collTitle.keys():
+						if not re.search(r"^\s*[A-Za-z0-9\-_]+\s*$", keyLang['en'], re.M) and currentKey in collTitle.keys():
 							body.append(current)
 							if totalValues < len(theLangs):
 								marked.append(len(body) - 1)
