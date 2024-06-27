@@ -350,15 +350,15 @@ def compileCSV(rows, isColl = False, isAsset = False):
 			#if totalValues == len(theLangs) and (theKey in ["title", "meta_title", "body_html"] or isAsset) and validValue(keyLang('en')):
 			if True: 
 				if isColl:
-					theValue = row[collTitle[theKey]] if row[collTitle[theKey]] is not None else ""
-					currentLang = 'en'
 					current = [f"https://comfort-works.com/collections/{theHandle}", theHandle, theKey]
-					keyLang[currentLang] = theValue
-					theValue = row[3] if row[3] is not None else ""
-					#current.append('"' + theValue + '"')
+					if theKey in collTitle.keys() and row[collTitle[theKey]]:
+						currentLang = 'en'
+						theValue = row[collTitle[theKey]] if row[collTitle[theKey]] is not None else ""
+						keyLang[currentLang] = theValue
 					currentLang = row[4].lower()
-					langsAdded.append(currentLang)
+					theValue = row[3] if row[3] is not None else ""
 					keyLang[currentLang] = theValue
+					langsAdded.append(currentLang)
 				else:
 					if isAsset:
 						theValue = row[3] if row[3] is not None else ""
@@ -374,6 +374,10 @@ def compileCSV(rows, isColl = False, isAsset = False):
 						langsAdded.append(currentLang)
 						keyLang[currentLang] = theValue
 		else:
+			if isColl and theKey in collTitle.keys() and row[collTitle[theKey]]:
+				currentLang = 'en'
+				theValue = row[collTitle[theKey]] if row[collTitle[theKey]] is not None else ""
+				keyLang[currentLang] = theValue
 			currentLang = row[4].lower()
 			theValue = row[3] if row[3] is not None else ""
 			keyLang[currentLang] = theValue
