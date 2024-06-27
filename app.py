@@ -279,7 +279,7 @@ def validValue(value):
 	isValid = True
 	if re.search(r"^\s*(https:\/\/|shopify:\/\/)\S*\s*", value, re.M) and not re.search(r"(<|>)", value, re.M):
 		isValid = False
-	if re.search(r"^\s*[A-Za-z0-9\-\_]+\s*$", value, re.M):
+	if re.search(r"^\s*[A-Za-z0-9\-\_\.]+\s*$", value, re.M):
 		isValid = False
 	if re.search(r"^\s*<svg", value, re.M):
 		isValid = False
@@ -495,7 +495,7 @@ def pageCSV(session: str, category: int = 1):
 		pass
 	cur.execute("select collection.id, collection.handle, tr_key, tr_value, lang, title, description, descriptionHtml from translatable join collection on resource_id = collection.id and resource_type = 2 where tr_key not like 'handle' order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
-	compiled = compileCSV(rows)
+	compiled = compileCSV(rows, True)
 	body = compiled['body']
 
 	lines = len(body)
@@ -527,7 +527,7 @@ def pageCSV(session: str, category: int = 1):
 		pass
 	cur.execute("select asset.id, asset.admin_graphql_api_id, tr_key, tr_value, lang, exact_url from translatable join asset on resource_id = asset.id and resource_type = 3 where tr_key not like 'handle' order by tr_key")
 	rows = cur.fetchall()
-	compiled = compileCSV(rows)
+	compiled = compileCSV(rows, False, True)
 	body = compiled['body']
 
 	lines = len(body)
