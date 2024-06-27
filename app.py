@@ -327,7 +327,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 				#if not (len(langsAdded) >= len(theLangs)) and 'en' in keyLang.keys() and validValue(keyLang['en']):
 				if 'en' in keyLang.keys() and validValue(keyLang['en']):
 					if isColl:
-						if not re.search(r"^[A-Za-z0-9]+(\-|_)[A-Za-z0-9]+((\-|_)[A-Za-z0-9]+)*", keyLang['en']) and currentKey in collTitle.keys():
+						if not re.search(r"^[A-Za-z0-9]+(\-|_)+[A-Za-z0-9]+((\-|_)+[A-Za-z0-9]+)*", keyLang['en']) and currentKey in collTitle.keys():
 							body.append(current)
 							if totalValues < len(theLangs):
 								marked.append(len(body) - 1)
@@ -357,21 +357,21 @@ def compileCSV(rows, isColl = False, isAsset = False):
 					keyLang[currentLang] = theValue
 					theValue = row[3] if row[3] is not None else ""
 					#current.append('"' + theValue + '"')
-					currentLang = row[4]
+					currentLang = row[4].lower()
 					langsAdded.append(currentLang)
 					keyLang[currentLang] = theValue
 				else:
 					if isAsset:
 						theValue = row[3] if row[3] is not None else ""
 						current = [row[5], "", theKey]
-						currentLang = row[4]
+						currentLang = row[4].lower()
 						langsAdded.append(currentLang)
 						keyLang[currentLang] = theValue
 					else:
 						theValue = row[3] if row[3] is not None else ""
 						#current = [row[0], theHandle, theKey]
 						current = [f"https://comfort-works.com/pages/{theHandle}", theHandle, theKey]
-						currentLang = row[4]
+						currentLang = row[4].lower()
 						langsAdded.append(currentLang)
 						keyLang[currentLang] = theValue
 		else:
