@@ -326,20 +326,21 @@ def compileCSV(rows, isColl = False, isAsset = False):
 				#if not (len(langsAdded) >= len(theLangs)) and 'en' in keyLang.keys() and validValue(keyLang['en']):
 				if 'en' in keyLang.keys() and validValue(keyLang['en']) and len(keyLang['en']) > 0:
 					if isColl:
-						if not re.search(r"^\s*[A-Za-z0-9\-_]+\s*$", keyLang['en'], re.M) and currentKey in collTitle.keys():
+						if not re.search(r"^\s*[A-Za-z0-9\-_]+\s*$", keyLang['en'], re.M) and current[2].strip() in ["title", "meta_title", "body_html", "meta_description"]:
 							body.append(current)
 							if totalValues < len(theLangs):
 								marked.append(len(body) - 1)
 					else:
 						if isAsset:
-							if currentKey in ["title", "meta_title", "body_html"]:
+							if current[2].strip() in ["title", "meta_title", "body_html", "meta_description"]:
 								body.append(current)
 								if totalValues < len(theLangs):
 									marked.append(len(body) - 1)
 						else:
-							body.append(current)
-							if totalValues < len(theLangs):
-								marked.append(len(body) - 1)
+							if current[2].strip() in ["title", "meta_title", "body_html", "meta_description"]:
+								body.append(current)
+								if totalValues < len(theLangs):
+									marked.append(len(body) - 1)
 				#csv = f"{csv}{preJoin}\n"
 				current = []
 				langsAdded = []
