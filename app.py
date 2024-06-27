@@ -318,13 +318,13 @@ def compileCSV(rows, isColl = False, isAsset = False):
 				for theLang in theLangs:
 					if theLang in keyLang.keys():
 						current.append(keyLang[theLang])
-						totalValues += 1
+						totalValues = totalValues + 1
 					else:
 						current.append('')
 				counter = counter + 1
 
 				#if not (len(langsAdded) >= len(theLangs)) and 'en' in keyLang.keys() and validValue(keyLang['en']):
-				if 'en' in keyLang.keys() and validValue(keyLang['en']):
+				if 'en' in keyLang.keys() and validValue(keyLang['en']) and len(keyLang['en']) > 0:
 					if isColl:
 						if not re.search(r"^\s*[A-Za-z0-9\-_]+\s*$", keyLang['en'], re.M) and currentKey in collTitle.keys():
 							body.append(current)
