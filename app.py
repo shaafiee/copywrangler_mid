@@ -318,7 +318,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 				for theLang in theLangs:
 					if theLang in keyLang.keys():
 						current.append(keyLang[theLang])
-						if len(keyLang[theLang]) > 2:
+						if len(keyLang[theLang]) < 5:
 							totalValues = totalValues + 1
 					else:
 						current.append('')
@@ -329,17 +329,17 @@ def compileCSV(rows, isColl = False, isAsset = False):
 					if isColl:
 						if not re.search(r"^\s*[A-Za-z0-9\-_]+\s*$", keyLang['en'], re.M) and current[2].strip() in ["title", "meta_title", "body_html", "meta_description"]:
 							body.append(current)
-							if totalValues < len(theLangs):
+							if totalValues > 0:
 								marked.append(len(body) - 1)
 					else:
 						if isAsset:
 							body.append(current)
-							if totalValues < len(theLangs):
+							if totalValues > 0:
 								marked.append(len(body) - 1)
 						else:
 							if current[2].strip() in ["title", "meta_title", "body_html", "meta_description"]:
 								body.append(current)
-								if totalValues < len(theLangs):
+								if totalValues > 0:
 									marked.append(len(body) - 1)
 				#csv = f"{csv}{preJoin}\n"
 				current = []
