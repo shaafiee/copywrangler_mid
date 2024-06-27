@@ -332,10 +332,9 @@ def compileCSV(rows, isColl = False, isAsset = False):
 								marked.append(len(body) - 1)
 					else:
 						if isAsset:
-							if current[2].strip() in ["title", "meta_title", "body_html", "meta_description"]:
-								body.append(current)
-								if totalValues < len(theLangs):
-									marked.append(len(body) - 1)
+							body.append(current)
+							if totalValues < len(theLangs):
+								marked.append(len(body) - 1)
 						else:
 							if current[2].strip() in ["title", "meta_title", "body_html", "meta_description"]:
 								body.append(current)
