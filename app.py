@@ -318,7 +318,8 @@ def compileCSV(rows, isColl = False, isAsset = False):
 				for theLang in theLangs:
 					if theLang in keyLang.keys():
 						current.append(keyLang[theLang])
-						totalValues = totalValues + 1
+						if len(keyLang[theLang]) < 3:
+							totalValues = totalValues + 1
 					else:
 						current.append('')
 				counter = counter + 1
