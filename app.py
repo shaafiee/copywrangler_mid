@@ -324,7 +324,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 						current.append('')
 				counter = counter + 1
 				if totalValues < len(theLangs):
-					marked.append(counter)
+					marked.append(len(body))
 				#if not (len(langsAdded) >= len(theLangs)) and 'en' in keyLang.keys() and validValue(keyLang['en']):
 				if 'en' in keyLang.keys() and validValue(keyLang['en']):
 					if isColl:
