@@ -322,6 +322,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 						totalValues += 1
 					else:
 						current.append('')
+						totalValues += 1
 				counter = counter + 1
 				if totalValues < len(theLangs):
 					marked.append(counter)
