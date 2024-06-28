@@ -332,19 +332,19 @@ def compileCSV(rows, isColl = False, isAsset = False):
 							body.append(current)
 							#if totalValues > 0:
 							if len(langsAdded.keys()) < len(theLangs):
-								marked.append(len(body) + 2)
+								marked.append(len(body) + 1)
 					else:
 						if isAsset:
 							body.append(current)
 							#if totalValues > 0:
 							if len(langsAdded.keys()) < len(theLangs):
-								marked.append(len(body) + 2)
+								marked.append(len(body) + 1)
 						else:
 							if current[2].strip() in ["title", "meta_title", "body_html", "meta_description"]:
 								body.append(current)
 								#if totalValues > 0:
 								if len(langsAdded.keys()) < len(theLangs):
-									marked.append(len(body) + 2)
+									marked.append(len(body) + 1)
 				#csv = f"{csv}{preJoin}\n"
 			current = []
 			langsAdded = {}
