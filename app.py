@@ -279,7 +279,7 @@ def validValue(value):
 	isValid = True
 	if re.search(r"^\s*(https:\/\/|shopify:\/\/)\S*\s*", value, re.M) and not re.search(r"(<|>)", value, re.M):
 		isValid = False
-	if re.search(r"^\s*[A-Za-z0-9\-\_\.]+\s*$", value, re.M):
+	if re.search(r"^\s*[A-Za-z0-9\-\_\.\/]+\s*$", value, re.M):
 		isValid = False
 	if re.search(r"^\s*<svg", value, re.M):
 		isValid = False
@@ -328,27 +328,27 @@ def compileCSV(rows, isColl = False, isAsset = False):
 				#if not (len(langsAdded) >= len(theLangs)) and 'en' in keyLang.keys() and validValue(keyLang['en']):
 				if 'en' in keyLang.keys() and validValue(keyLang['en']) and len(keyLang['en']) > 0:
 					if isColl:
-						if not re.search(r"^\s*[A-Za-z0-9\-_]+\s*$", keyLang['en'], re.M) and current[2].strip() in ["title", "meta_title", "body_html", "meta_description"]:
+						if not re.search(r"^\s*[A-Za-z0-9\-_\/]+\s*$", keyLang['en'], re.M) and current[2].strip() in ["title", "meta_title", "body_html", "meta_description"]:
 							body.append(current)
 							#if totalValues > 0:
 							if len(langsAdded.keys()) < len(theLangs):
-								marked.append(len(body) + 1)
+								marked.append(len(body) + 2)
 					else:
 						if isAsset:
 							body.append(current)
 							#if totalValues > 0:
 							if len(langsAdded.keys()) < len(theLangs):
-								marked.append(len(body) + 1)
+								marked.append(len(body) + 2)
 						else:
 							if current[2].strip() in ["title", "meta_title", "body_html", "meta_description"]:
 								body.append(current)
 								#if totalValues > 0:
 								if len(langsAdded.keys()) < len(theLangs):
-									marked.append(len(body) + 1)
+									marked.append(len(body) + 2)
 				#csv = f"{csv}{preJoin}\n"
-				current = []
-				langsAdded = {}
-				keyLang = {}
+			current = []
+			langsAdded = {}
+			keyLang = {}
 			currentKey = row[2]
 			theHandle = row[1] if row[1] is not None else ""
 			theKey = row[2] if row[2] is not None else ""
