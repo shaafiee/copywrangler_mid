@@ -359,7 +359,9 @@ def compileCSV(rows, isColl = False, isAsset = False):
 					if theKey in collTitle.keys() and row[collTitle[theKey]]:
 						currentLang = 'en'
 						theValue = row[collTitle[theKey]] if row[collTitle[theKey]] is not None else ""
-						keyLang[currentLang] = theValue
+						if theValue != "":
+							langsAdded[currentLang] = True
+							keyLang[currentLang] = theValue
 					currentLang = row[4].lower()
 					theValue = row[3] if row[3] is not None else ""
 					if theValue != "":
