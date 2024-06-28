@@ -325,7 +325,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 				counter = counter + 1
 
 				#if not (len(langsAdded) >= len(theLangs)) and 'en' in keyLang.keys() and validValue(keyLang['en']):
-				if 'en' in keyLang.keys() and validValue(keyLang['en']):
+				if 'en' in keyLang.keys() and validValue(keyLang['en']) and len(keyLang['en']) > 0:
 					if isColl:
 						if not re.search(r"^\s*[A-Za-z0-9\-_]+\s*$", keyLang['en'], re.M) and current[2].strip() in ["title", "meta_title", "body_html", "meta_description"]:
 							body.append(current)
@@ -369,7 +369,6 @@ def compileCSV(rows, isColl = False, isAsset = False):
 						keyLang[currentLang] = theValue
 					else:
 						theValue = row[3] if row[3] is not None else ""
-						#current = [row[0], theHandle, theKey]
 						current = [f"https://comfort-works.com/pages/{theHandle}", theHandle, theKey]
 						currentLang = row[4].lower()
 						langsAdded.append(currentLang)
