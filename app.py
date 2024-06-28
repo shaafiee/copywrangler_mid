@@ -295,7 +295,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 	#collTitle = {"title": 5, "description": 6, "body_html": 7, "descriptionHtml": 7}
 	collTitle = {"title": 5, "body_html": 7}
 	theLangs = ["en", "de", "fr", "es", "ja"]
-	langsAdded = []
+	langsAdded = {}
 	csv = ""
 	csvLangs = []
 	currentValues = []
