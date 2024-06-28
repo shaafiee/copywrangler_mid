@@ -322,7 +322,7 @@ def compileCSV(rows, isColl = False, isAsset = False):
 							totalValues = totalValues + 1
 					else:
 						current.append('')
-						totalValues += 1
+						totalValues = totalValues + 1
 				counter = counter + 1
 
 				#if not (len(langsAdded) >= len(theLangs)) and 'en' in keyLang.keys() and validValue(keyLang['en']):
