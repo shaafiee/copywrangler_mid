@@ -279,9 +279,13 @@ def validValue(value):
 	isValid = True
 	if re.search(r"^\s*(https:\/\/|shopify:\/\/)\S*\s*", value, re.M) and not re.search(r"(<|>)", value, re.M):
 		isValid = False
-	if re.search(r"^[A-Za-z0-9]+$", value):
+	if re.search(r"^\s*[A-Za-z0-9\-\_\.]+\s*$", value, re.M):
 		isValid = False
-	if re.search(r"^\s*<svg.*</svg>\s*$", value, re.M):
+	if re.search(r"^\s*<svg", value, re.M):
+		isValid = False
+	if re.search(r"^\s*<script", value, re.M):
+		isValid = False
+	if re.search(r"^\s*<iframe", value, re.M):
 		isValid = False
 	return isValid
 	
@@ -313,30 +317,31 @@ def compileCSV(rows, isColl = False, isAsset = False):
 				totalValues = 0
 				for theLang in theLangs:
 					if theLang in keyLang.keys():
-						#if isColl and theLang != 'en':
-						#	current.append(keyLang[theLang])
-						#else:
-						#	if not isColl or (isColl and theLang == 'en' and theLang in keyLang.keys()):
-						#		current.append(keyLang[theLang])
 						current.append(keyLang[theLang])
-						totalValues += 1
+						if len(keyLang[theLang]) < 5:
+							totalValues = totalValues + 1
 					else:
 						current.append('')
 						totalValues += 1
 				counter = counter + 1
-				if totalValues < len(theLangs):
-					marked.append(counter)
+
 				#if not (len(langsAdded) >= len(theLangs)) and 'en' in keyLang.keys() and validValue(keyLang['en']):
-				if 'en' in keyLang.keys() and validValue(keyLang['en']):
+				if 'en' in keyLang.keys() and validValue(keyLang['en']) and len(keyLang['en']) > 0:
 					if isColl:
-						if not re.search(r"^[A-Za-z0-9]+(\-|_)[A-Za-z0-9]+((\-|_)[A-Za-z0-9]+)*", keyLang['en']) and currentKey in collTitle.keys():
+						if not re.search(r"^\s*[A-Za-z0-9\-_]+\s*$", keyLang['en'], re.M) and current[2].strip() in ["title", "meta_title", "body_html", "meta_description"]:
 							body.append(current)
+							if totalValues > 0:
+								marked.append(len(body) - 1)
 					else:
 						if isAsset:
-							if currentKey in ["title", "meta_title", "body_html"]:
-								body.append(current)
-						else:
 							body.append(current)
+							if totalValues > 0:
+								marked.append(len(body) - 1)
+						else:
+							if current[2].strip() in ["title", "meta_title", "body_html", "meta_description"]:
+								body.append(current)
+								if totalValues > 0:
+									marked.append(len(body) - 1)
 				#csv = f"{csv}{preJoin}\n"
 				current = []
 				langsAdded = []
@@ -347,30 +352,33 @@ def compileCSV(rows, isColl = False, isAsset = False):
 			#if totalValues == len(theLangs) and (theKey in ["title", "meta_title", "body_html"] or isAsset) and validValue(keyLang('en')):
 			if True: 
 				if isColl:
-					theValue = row[collTitle[theKey]] if row[collTitle[theKey]] is not None else ""
-					currentLang = 'en'
 					current = [f"https://comfort-works.com/collections/{theHandle}", theHandle, theKey]
-					keyLang[currentLang] = theValue
+					if theKey in collTitle.keys() and row[collTitle[theKey]]:
+						currentLang = 'en'
+						theValue = row[collTitle[theKey]] if row[collTitle[theKey]] is not None else ""
+						keyLang[currentLang] = theValue
+					currentLang = row[4].lower()
 					theValue = row[3] if row[3] is not None else ""
-					#current.append('"' + theValue + '"')
-					currentLang = row[4]
-					langsAdded.append(currentLang)
 					keyLang[currentLang] = theValue
+					langsAdded.append(currentLang)
 				else:
 					if isAsset:
 						theValue = row[3] if row[3] is not None else ""
 						current = [row[5], "", theKey]
-						currentLang = row[4]
+						currentLang = row[4].lower()
 						langsAdded.append(currentLang)
 						keyLang[currentLang] = theValue
 					else:
 						theValue = row[3] if row[3] is not None else ""
-						#current = [row[0], theHandle, theKey]
 						current = [f"https://comfort-works.com/pages/{theHandle}", theHandle, theKey]
-						currentLang = row[4]
+						currentLang = row[4].lower()
 						langsAdded.append(currentLang)
 						keyLang[currentLang] = theValue
 		else:
+			if isColl and theKey in collTitle.keys() and row[collTitle[theKey]]:
+				currentLang = 'en'
+				theValue = row[collTitle[theKey]] if row[collTitle[theKey]] is not None else ""
+				keyLang[currentLang] = theValue
 			currentLang = row[4].lower()
 			theValue = row[3] if row[3] is not None else ""
 			keyLang[currentLang] = theValue
@@ -448,7 +456,7 @@ def pageCSV(session: str, category: int = 1):
 
 	spreadsheet.share('comfort-works.com', perm_type='domain', role='writer')
 
-
+	curFmt = cellFormat(backgroundColor=color(.99, .8, .8))
 	try:
 		worksheet = spreadsheet.worksheet("Pages")
 		spreadsheet.del_worksheet(worksheet)
@@ -469,9 +477,15 @@ def pageCSV(session: str, category: int = 1):
 
 	worksheet.update(rangeName, body)
 	toFormat = []
+	counter = 0
 	for needTrans in compiled["marked"]:
-		toFormat.append((f"A{needTrans}:{endColumn}{needTrans}", cellFormat(backgroundColor=(.99, .8, .8))))
-	format_cell_ranges(worksheet, toFormat)
+		counter = counter + 1
+		toFormat.append((f"A{needTrans}:{endColumn}{needTrans}", curFmt))
+		if counter >= 1400:
+			format_cell_ranges(worksheet, toFormat)
+			counter = 0
+	if len(toFormat) > 0:
+		format_cell_ranges(worksheet, toFormat)
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
@@ -482,7 +496,7 @@ def pageCSV(session: str, category: int = 1):
 		pass
 	cur.execute("select collection.id, collection.handle, tr_key, tr_value, lang, title, description, descriptionHtml from translatable join collection on resource_id = collection.id and resource_type = 2 where tr_key not like 'handle' order by resource_id, tr_key, lang")
 	rows = cur.fetchall()
-	compiled = compileCSV(rows)
+	compiled = compileCSV(rows, True)
 	body = compiled['body']
 
 	lines = len(body)
@@ -495,9 +509,15 @@ def pageCSV(session: str, category: int = 1):
 
 	worksheet.update(rangeName, body)
 	toFormat = []
+	counter = 0
 	for needTrans in compiled["marked"]:
-		toFormat.append((f"A{needTrans}:{endColumn}{needTrans}", cellFormat(backgroundColor=(.99, .8, .8))))
-	format_cell_ranges(worksheet, toFormat)
+		counter = counter + 1
+		toFormat.append((f"A{needTrans}:{endColumn}{needTrans}", curFmt))
+		if counter >= 1400:
+			format_cell_ranges(worksheet, toFormat)
+			counter = 0
+	if len(toFormat) > 0:
+		format_cell_ranges(worksheet, toFormat)
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
@@ -508,7 +528,7 @@ def pageCSV(session: str, category: int = 1):
 		pass
 	cur.execute("select asset.id, asset.admin_graphql_api_id, tr_key, tr_value, lang, exact_url from translatable join asset on resource_id = asset.id and resource_type = 3 where tr_key not like 'handle' order by tr_key")
 	rows = cur.fetchall()
-	compiled = compileCSV(rows)
+	compiled = compileCSV(rows, False, True)
 	body = compiled['body']
 
 	lines = len(body)
@@ -521,10 +541,15 @@ def pageCSV(session: str, category: int = 1):
 
 	worksheet.update(rangeName, body)
 	toFormat = []
+	counter = 0
 	for needTrans in compiled["marked"]:
-		toFormat.append((f"A{needTrans}:{endColumn}{needTrans}", cellFormat(backgroundColor=(.99, .8, .8))))
-		#toFormat.append((f"A{needTrans}:{endColumn}{needTrans}", {"backgroundColor": {"red": .99, "green": .80, "blue": .80, "alpha": 1}}))
-	format_cell_ranges(worksheet, toFormat)
+		counter = counter + 1
+		toFormat.append((f"A{needTrans}:{endColumn}{needTrans}", curFmt))
+		if counter >= 1400:
+			format_cell_ranges(worksheet, toFormat)
+			counter = 0
+	if len(toFormat) > 0:
+		format_cell_ranges(worksheet, toFormat)
 	worksheet.format(wrapRangeName, {"wrapStrategy": "WRAP"})
 
 
