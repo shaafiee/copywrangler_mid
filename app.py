@@ -55,6 +55,9 @@ app.add_middleware(
 )
 
 
+curFmt = cellFormat(backgroundColor=color(.99, .8, .8))
+
+
 currentSubdomain = "cw40"
 headers = {"Accept": "*/*", "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36", "Content-Type": "application/json", "Origin": "https://" + currentSubdomain + "comfort-works.com", "Referer": "https://" + currentSubdomain + "comfort-works.com/en/my-account/authenticate/"}
 
@@ -587,10 +590,8 @@ def updateItem(conn, cur, table, handle, key, value, lang):
 	if cur.rowcount < 1:
 		return False
 	resourceId = cur.fetchone()[0]
-	key = key.rstrip()
-	key = key.lstrip()
-	value = value.rstrip()
-	value = value.lstrip()
+	key = key.strip()
+	value = value.strip()
 	cur.execute("select altered from translatable where resource_id = %s and tr_key like %s and tr_value like %s and lang = %s", (resourceId, key, value, lang))
 	if cur.rowcount > 0:
 		return False
@@ -675,7 +676,10 @@ def uploadSheet(scope: UploadSheet):
 		for idx, page in enumerate(pages):
 			if idx > 0:
 				for jdx in range(5):
-					updateItem(conn, cur, "page", pages[idx][1], pages[idx][2], pages[idx][3 + jdx], lang)
+					#updateItem(conn, cur, "page", pages[idx][1], pages[idx][2], pages[idx][3 + jdx], lang)
+					currentFormat = get_user_entered_format(pageSheet, "A" + (idx + 1))
+					if idx == 1:
+						return {"status": 1, "content": cellFormat}
 
 		for idx, coll in enumerate(colls):
 			if idx > 0:
